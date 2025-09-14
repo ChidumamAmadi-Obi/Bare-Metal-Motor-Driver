@@ -1,4 +1,4 @@
-# Bare-Metal Motor Driver - STM32F401RE
+# Bare-Metal STM32 Motor Driver, PWM + ADC Control without HAL
 This project demonstrates a **bare-metal motor driver** using the **STM32 Nucleo-F401RE**, written in C with **PlatformIO and CMSIS** (no ArduinoIDE, no HAL, no CubeMX).
 The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor driver IC**, controlled by a potentiometer.
 
