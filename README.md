@@ -16,7 +16,7 @@ The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor dri
 ### Roadmap
 Phase 1: Basic
  - [x]  Blink LED using GPIO registers
- - [ ]  Print debug info to serial (USART2)
+ - [x]  Print debug info to serial (USART2)
  - [ ]  Read potentiometer value via ADC1
 Phase 2: Direction Control
  - [ ] Turn on left LED when pot is tured left
