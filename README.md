@@ -18,11 +18,13 @@ Phase 1: Basic
  - [x]  Blink LED using GPIO registers
  - [x]  Print debug info to serial (USART2)
  - [ ]  Read potentiometer value via ADC1
+
 Phase 2: Direction Control
  - [ ] Turn on left LED when pot is tured left
  - [ ] Turn on right LED when pot is tured right
  - [ ] Turn both LEDs off when pot ~ mid
-Phase 3:
+
+Phase 3: PWM Control
  - [ ] Configure TIM2 for PWM output
  - [ ] Map pot value to PWM duty cycle
  - [ ] Crive LEDs with brightness proportional to pot position
