@@ -6,6 +6,10 @@ The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor dri
 * Turn the potentiometer **right** - motor spins right / right LED brightens.
 * Keep the potentiometer **centered** - motor stops / LEDs off.
 
+## Demo of Phase 1: Blinking an LED While Reading and printing the ADC value via USART2
+
+![Phase1_BareMetalDriver(1)](https://github.com/user-attachments/assets/f69e2aad-3694-48d1-92f4-05018f8f1235)
+
 ### Hardware
 * STM32 Nucleo-F401RE
 * L9110H motor driver IC
@@ -32,8 +36,18 @@ Phase 3: PWM Control
 
 ### Getting Started
 
+#### Prerequisites
+* Ensure PlatformIO is installed. (Either via VSCode + PlatformIO plugin, or PlatformIO Core (CLI)).
+* Ensure toolchain and board support for STM32F401RE (CMSIS) is installed. PlatformIO should pull that.
+
+#### Setup
 1) Clone repo
-2) Build and Upload with PlatformIO
+```
+git clone https://github.com/ChidumamAmadi-Obi/Bare-Metal-Motor-Driver.git
+cd Bare-Metal-Motor-Driver
+```
+2) Open in VSCode with Platformio
+3) Build and Upload with PlatformIO
 ```
 pio run
 pio upload
