@@ -27,7 +27,7 @@ Phase 2: Direction Control
 Phase 3: PWM Control
  - [ ] Configure TIM2 for PWM output
  - [ ] Map pot value to PWM duty cycle
- - [ ] Crive LEDs with brightness proportional to pot position
+ - [ ] Drive LEDs with brightness proportional to pot position
  - [ ] Replace LEDs with DC motor via L9110H
 
 ### Getting Started
