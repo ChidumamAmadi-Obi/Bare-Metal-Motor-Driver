@@ -36,7 +36,7 @@ void configureTimerPWM_D6(uint8_t dutyCycle) {
     TIM2->CCMR2 |= (6 << TIM_CCMR2_OC3M_Pos); 
     TIM2->CCMR2 |= TIM_CCMR2_OC3PE;           
     TIM2->CCER |= TIM_CCER_CC3E;               
-    TIM2->CCR3 = 4000*dutyCycle;                         // 50% duty cycle for D6
+    TIM2->CCR3 = 4000*dutyCycle;                         
     TIM2->CR1 |= TIM_CR1_ARPE;                 
     TIM2->CR1 |= TIM_CR1_CEN;                 
 }
@@ -56,9 +56,10 @@ void configureTimerPWM_D5(uint8_t dutyCycle) {
     TIM3->CR1 |= TIM_CR1_CEN;                 
 }
 
-void configureOnBoardLED(void){ 
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       // enables GPIOA clocks
-    GPIOA->MODER |= (1 << 10);                 // Set PA5 as output
+void configureOnBoardLED(void){ // Enables onboard LED
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       
+    GPIOA->MODER |= (1 << 10);                 
 }
+
 
 #endif
