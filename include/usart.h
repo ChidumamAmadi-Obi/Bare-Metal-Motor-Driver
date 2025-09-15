@@ -6,44 +6,36 @@
 #include "stm32f4xx.h"
 
 #ifndef SystemCoreClock
-#define SystemCoreClock 16000000 // system clock definition (16MHz)
+#define SystemCoreClock 16000000 // 16MHz in datasheet
 #endif
 
 void usart2Init(uint32_t baud_rate) { // Initialize USART2 with specified baud rate 
-    
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // Enable clocks for GPIOA and USART2
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
     
-    // Configure PA2 (TX) and PA3 (RX) for alternate function
+    // Configures PA2 (TX) and PA3 (RX) for alternate function
     GPIOA->MODER &= ~(GPIO_MODER_MODER2 | GPIO_MODER_MODER3);
     GPIOA->MODER |= (2 << GPIO_MODER_MODER2_Pos) | (2 << GPIO_MODER_MODER3_Pos);
     
-    // Set alternate function to AF7 (USART2)
+    // Sets alternate function to AF7 (USART2)
     GPIOA->AFR[0] &= ~(GPIO_AFRL_AFSEL2 | GPIO_AFRL_AFSEL3);
     GPIOA->AFR[0] |= (7 << GPIO_AFRL_AFSEL2_Pos) | (7 << GPIO_AFRL_AFSEL3_Pos);
     
-    // Configure USART2
+    // Configures USART2
     USART2->BRR = SystemCoreClock / baud_rate;
-    USART2->CR1 = USART_CR1_TE | USART_CR1_RE;  // Enable transmitter and receiver
-    USART2->CR1 |= USART_CR1_UE;                // Enable USART2
+    USART2->CR1 = USART_CR1_TE | USART_CR1_RE;  
+    USART2->CR1 |= USART_CR1_UE;               
 }
-
-
-void usart2SendChar(char c) {// Send a single character
-    // Wait until transmit data register is empty
-    while (!(USART2->SR & USART_SR_TXE));
+void usart2SendChar(char c) {
+    while (!(USART2->SR & USART_SR_TXE)); 
     USART2->DR = (c & 0xFF);
 }
-
-
 void usart2SendString(const char *str) {
     while (*str) {
         usart2SendChar(*str++);
     }
 }
-
-
-void usart2SendNumber(int32_t num) {// Send a interger
+void usart2SendNumber(int32_t num) {
     char buffer[12]; 
     char *ptr = buffer;
     int32_t n = num;
@@ -64,9 +56,7 @@ void usart2SendNumber(int32_t num) {// Send a interger
         usart2SendChar(*--ptr);
     }
 }
-
-
-void usart2SendHex(uint32_t num) {// Send a number in hexadecimal format
+void usart2SendHex(uint32_t num) {
     usart2SendString("0x");
     
     if (num == 0) {
@@ -74,8 +64,8 @@ void usart2SendHex(uint32_t num) {// Send a number in hexadecimal format
         return;
     }
     
-    // Find the position of the first non-zero hex digit
-    uint8_t started = 0;
+    
+    uint8_t started = 0; // Find the position of the first non-zero hex digit
     for (int8_t i = 7; i >= 0; i--) {
         uint8_t nibble = (num >> (i * 4)) & 0xF;
         if (nibble != 0 || started || i == 0) {
@@ -84,14 +74,10 @@ void usart2SendHex(uint32_t num) {// Send a number in hexadecimal format
         }
     }
 }
-
-
-void usart2NewLine(void) {// Send a newline
+void usart2NewLine(void) {
     usart2SendString("\r\n");
 }
-
-
-static void simplePrintf(const char *format, va_list args) {// Simple implementation of printf for USART
+static void simplePrintf(const char *format, va_list args) {
     while (*format) {
         if (*format == '%') {
             format++;
@@ -126,9 +112,7 @@ static void simplePrintf(const char *format, va_list args) {// Simple implementa
         format++;
     }
 }
-
-
-void usart2Printf(const char *format, ...) {// Format and send string (basic implementation)
+void usart2Printf(const char *format, ...) {// Format and send string
     va_list args;
     va_start(args, format);
     simplePrintf(format, args);
