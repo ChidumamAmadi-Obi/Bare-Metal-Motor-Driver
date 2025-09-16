@@ -28,7 +28,7 @@ void configGPIO(void){ // each GPIO pin is configured with a separate clock and 
 
 void configureTimerPWM_D6(uint8_t dutyCycle) {
     TIM2->CR1 &= ~TIM_CR1_CEN;                
-    TIM2->PSC = 400 - 1;                       // 16MHz/400 = 20kHz timer clock
+    TIM2->PSC = 400 - 1;                       // 16MHz/400 = 40kHz timer clock
     TIM2->ARR = 4000 - 1;                      // 40kHz/4000 = 10Hz PWM frequency
     
     // Configure channel 3
@@ -36,7 +36,7 @@ void configureTimerPWM_D6(uint8_t dutyCycle) {
     TIM2->CCMR2 |= (6 << TIM_CCMR2_OC3M_Pos); 
     TIM2->CCMR2 |= TIM_CCMR2_OC3PE;           
     TIM2->CCER |= TIM_CCER_CC3E;               
-    TIM2->CCR3 = 4000*dutyCycle;                         
+    TIM2->CCR3 = (4000 * dutyCycle) / 255;                             
     TIM2->CR1 |= TIM_CR1_ARPE;                 
     TIM2->CR1 |= TIM_CR1_CEN;                 
 }
@@ -51,7 +51,7 @@ void configureTimerPWM_D5(uint8_t dutyCycle) {
     TIM3->CCMR1 |= (6 << TIM_CCMR1_OC1M_Pos);  
     TIM3->CCMR1 |= TIM_CCMR1_OC1PE;           
     TIM3->CCER |= TIM_CCER_CC1E;              
-    TIM3->CCR1 = 4000*dutyCycle;                         
+    TIM3->CCR1 = (4000 * dutyCycle) / 255;                           
     TIM3->CR1 |= TIM_CR1_ARPE;                 
     TIM3->CR1 |= TIM_CR1_CEN;                 
 }

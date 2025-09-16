@@ -56,20 +56,26 @@ void systemInit(){
     configureOnBoardLED();
 }
 
+
 inline uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-
 void motorControl(uint16_t adcValue){ // maps adcvalue to pwm duty cycle
-    uint8_t motorSpeed;
+    uint8_t motorSpeedL;
+    uint8_t motorSpeedR;
     if (adcValue > MIN_DEADBAND_THRESHOLD && adcValue < MAX_DEADBAND_THRESHOLD) { //deadband
-        motorSpeed = 0;
+        motorSpeedR = 0;
+        motorSpeedL = 0;
     } else if (adcValue < MIN_DEADBAND_THRESHOLD) {
-        motorSpeed = map(adcValue, 0, MIN_DEADBAND_THRESHOLD, 100, 0);
+        motorSpeedL = map(adcValue, 0, MIN_DEADBAND_THRESHOLD, 255, 0);
+        motorSpeedR = 0;
     } else if (adcValue > MAX_DEADBAND_THRESHOLD) {
-        motorSpeed = map(adcValue, 4096, MAX_DEADBAND_THRESHOLD, 100, 0);
+        motorSpeedR = map(adcValue, 4096, MAX_DEADBAND_THRESHOLD, 255, 0);
+        motorSpeedL = 0;
     }
-    usart2Printf("Motor Speed %d\r\n", motorSpeed);
+    configureTimerPWM_D6(motorSpeedL);
+    configureTimerPWM_D5(motorSpeedR);
+    usart2Printf("ADC Value %d, Motor Speed %d %d\r\n",adcValue, motorSpeedL, motorSpeedR);
 }
 
 #endif
