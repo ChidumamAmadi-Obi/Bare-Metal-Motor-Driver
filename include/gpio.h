@@ -28,8 +28,8 @@ void configGPIO(void){ // each GPIO pin is configured with a separate clock and 
 
 void configureTimerPWM_D6(uint8_t dutyCycle) {
     TIM2->CR1 &= ~TIM_CR1_CEN;                
-    TIM2->PSC = 400 - 1;                       // 16MHz/400 = 40kHz timer clock
-    TIM2->ARR = 4000 - 1;                      // 40kHz/4000 = 10Hz PWM frequency
+    TIM2->PSC = 400 - 1;                       
+    TIM2->ARR = 4000 - 1;                     
     
     // Configure channel 3
     TIM2->CCMR2 &= ~TIM_CCMR2_OC3M;           
@@ -60,5 +60,6 @@ void configureOnBoardLED(void){
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       // enables GPIOA clocks
     GPIOA->MODER |= (1 << 10);                 // Set PA5 as output
 }
+
 
 #endif
