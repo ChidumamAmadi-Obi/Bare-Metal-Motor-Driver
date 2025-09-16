@@ -1,6 +1,9 @@
 #ifndef MOTOR_CONTROL_H
 #define MOTOR_CONTROL_H
 
+#define MIN_DEADBAND_THRESHOLD 1048
+#define MAX_DEADBAND_THRESHOLD 3048
+
 #include "stm32f4xx.h"
 
 #include <stdint.h>
@@ -51,6 +54,22 @@ void systemInit(){
     usart2Printf("Starting D6 and D5 on 0 percent duty cycle...\r\n");
     usart2NewLine();
     configureOnBoardLED();
+}
+
+inline uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+void motorControl(uint16_t adcValue){ // maps adcvalue to pwm duty cycle
+    uint8_t motorSpeed;
+    if (adcValue > MIN_DEADBAND_THRESHOLD && adcValue < MAX_DEADBAND_THRESHOLD) { //deadband
+        motorSpeed = 0;
+    } else if (adcValue < MIN_DEADBAND_THRESHOLD) {
+        motorSpeed = map(adcValue, 0, MIN_DEADBAND_THRESHOLD, 100, 0);
+    } else if (adcValue > MAX_DEADBAND_THRESHOLD) {
+        motorSpeed = map(adcValue, 4096, MAX_DEADBAND_THRESHOLD, 100, 0);
+    }
+    usart2Printf("Motor Speed %d\r\n", motorSpeed);
 }
 
 #endif

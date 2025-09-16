@@ -56,10 +56,9 @@ void configureTimerPWM_D5(uint8_t dutyCycle) {
     TIM3->CR1 |= TIM_CR1_CEN;                 
 }
 
-void configureOnBoardLED(void){ // Enables onboard LED
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       
-    GPIOA->MODER |= (1 << 10);                 
+void configureOnBoardLED(void){ 
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       // enables GPIOA clocks
+    GPIOA->MODER |= (1 << 10);                 // Set PA5 as output
 }
-
 
 #endif
