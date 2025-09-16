@@ -24,9 +24,9 @@ Phase 1: Basic
  - [x]  Read potentiometer value via ADC1
 
 Phase 2: Direction Control
- - [ ] Turn on left LED when pot is tured left
- - [ ] Turn on right LED when pot is tured right
- - [ ] Turn both LEDs off when pot ~ mid
+ - [x] Turn on left LED when pot is tured left
+ - [x] Turn on right LED when pot is tured right
+ - [x] Turn both LEDs off when pot ~ mid
 
 Phase 3: PWM Control
  - [x] Configure TIM2 for PWM output
