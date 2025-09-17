@@ -5,6 +5,7 @@ The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor dri
 * Turn the potentiometer **left** - motor spins left / left LED brightens.
 * Turn the potentiometer **right** - motor spins right / right LED brightens.
 * Keep the potentiometer **centered** - motor stops / LEDs off.
+* Visualize motor speed with LED bar graph.
 
 ## Demo of Phase 1: Blinking an LED While Reading and printing the ADC value via USART2
 
@@ -14,25 +15,25 @@ The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor dri
 * STM32 Nucleo-F401RE
 * L9110H motor driver IC
 * 1 kΩ potentiometer
-* LEDs (or DC motor for final test)
 * Resistors (current limiting for LEDs)
+* 8 LEDs (for speed visualizer)
+* DC Motor (or 2 LEDs for final test)
 
 ### Roadmap
-Phase 1: Basic
+**Phase 1: Basic**
  - [x]  Blink LED using GPIO registers
  - [x]  Print debug info to serial (USART2)
  - [x]  Read potentiometer value via ADC1
 
-Phase 2: Direction Control
- - [x] Turn on left LED when pot is tured left
- - [x] Turn on right LED when pot is tured right
- - [x] Turn both LEDs off when pot ~ mid
-
-Phase 3: PWM Control
+**Phase 2: PWM & Direction Control**
  - [x] Configure TIM2 for PWM output
  - [x] Map pot value to PWM duty cycle
- - [ ] Drive LEDs with brightness proportional to pot position
- - [ ] Replace LEDs with DC motor via L9110H
+ - [x] Drive LEDs with brightness proportional to pot position
+
+**Phase 3: LED Visualizer & Motor Integration**
+ - [ ] Implement **LED bar graph visualizer** (8–10 LEDs, showing direction + speed)  
+ - [ ] Replace LEDs with DC motor via L9110H  
+ - [ ] Map pot input to motor direction (left/right) and speed (PWM duty cycle)  
 
 ### Getting Started
 
