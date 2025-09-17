@@ -1,4 +1,5 @@
 # Bare-Metal STM32 Motor Driver, PWM + ADC Control without HAL
+![In Progress Badge](https://img.shields.io/badge/status-in%20progress-orange)  
 This project demonstrates a **bare-metal motor driver** using the **STM32 Nucleo-F401RE**, written in C with **PlatformIO and CMSIS** (no ArduinoIDE, no HAL, no CubeMX).
 The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor driver IC**, controlled by a potentiometer.
 
@@ -47,8 +48,28 @@ The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor dri
 git clone https://github.com/ChidumamAmadi-Obi/Bare-Metal-Motor-Driver.git
 cd Bare-Metal-Motor-Driver
 ```
-2) Open in VSCode with Platformio
-3) Build and Upload with PlatformIO
+2) Open in VSCode with PlatformIO
+3) Connect components as per wiring diagram
+```
+_________________________
+- PWM Pins
+L9110 Pin 6 = D5 or PB14
+L9110 Pin 7 = D6 or PB15
+_________________________
+- Analog Input Pin
+ADC = PA0
+_________________________
+- LED Visualizer Pins
+LED_L0 = PC0 left side
+LED_L1 = PC1
+LED_L2 = PC2
+LED_L3 = PC3
+LED_R0 = PC4 right side
+LED_R1 = PC5
+LED_R2 = PC6
+LED_R3 = PC7
+```
+4) Build and Upload with PlatformIO
 ```
 pio run
 pio upload
