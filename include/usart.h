@@ -5,9 +5,7 @@
 #include <stdarg.h>
 #include "stm32f4xx.h"
 
-#ifndef SystemCoreClock
 #define SystemCoreClock 16000000 // 16MHz in datasheet
-#endif
 
 void usart2Init(uint32_t baud_rate) { // Initialize USART2 with specified baud rate 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;

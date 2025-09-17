@@ -35,46 +35,46 @@ void systemInit(){
     usart2Init(115200);
     usart2Printf("USART2 Initialized...\r\n");
     usart2Printf("System clock: %d Hz\r\n", SystemCoreClock);
-    usart2NewLine();
 
     ADCInit();
     usart2Printf("ADC A0 Initialized...\r\n");
-    usart2NewLine();
 
     enableClocks();
     usart2Printf("Clocks TIM2 and TIM3 configured...\r\n");
-    usart2NewLine();
 
     configGPIO();
     usart2Printf("GPIO Pins D5 and D6 configured...\r\n");
-    usart2NewLine();
 
     configureTimerPWM_D6(0); // D6 and D5 with TIM2 and TIM3 - 10Hz, 0% duty cycle
     configureTimerPWM_D5(0);
     usart2Printf("Starting D6 and D5 on 0 percent duty cycle...\r\n");
-    usart2NewLine();
     configureOnBoardLED();
 }
 
-
+// motor control
 inline uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-void motorControl(uint16_t adcValue){ // maps adcvalue to pwm duty cycle
+void motorControl(uint16_t adcValue){
     uint8_t motorSpeedL;
     uint8_t motorSpeedR;
-    if (adcValue > MIN_DEADBAND_THRESHOLD && adcValue < MAX_DEADBAND_THRESHOLD) { //deadband
+
+    if (adcValue > MIN_DEADBAND_THRESHOLD && adcValue < MAX_DEADBAND_THRESHOLD){ // if adc in deadband
         motorSpeedR = 0;
         motorSpeedL = 0;
-    } else if (adcValue < MIN_DEADBAND_THRESHOLD) {
-        motorSpeedL = map(adcValue, 0, MIN_DEADBAND_THRESHOLD, 255, 0);
-        motorSpeedR = 0;
-    } else if (adcValue > MAX_DEADBAND_THRESHOLD) {
-        motorSpeedR = map(adcValue, 4096, MAX_DEADBAND_THRESHOLD, 255, 0);
-        motorSpeedL = 0;
+    } else {
+        if ( adcValue < MIN_DEADBAND_THRESHOLD ) {
+            motorSpeedL = map(adcValue, 0, MIN_DEADBAND_THRESHOLD, 255, 0);
+            motorSpeedR = 0;
+        }
+        if ( adcValue > MAX_DEADBAND_THRESHOLD ) {
+            motorSpeedR = map(adcValue, 4096, MAX_DEADBAND_THRESHOLD, 255, 0);
+            motorSpeedL = 0;
+        }
     }
-    configureTimerPWM_D6(motorSpeedL);
+    
     configureTimerPWM_D5(motorSpeedR);
+    configureTimerPWM_D6(motorSpeedL);
     usart2Printf("ADC Value %d, Motor Speed %d %d\r\n",adcValue, motorSpeedL, motorSpeedR);
 }
 
