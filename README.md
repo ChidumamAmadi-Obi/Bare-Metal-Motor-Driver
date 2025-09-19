@@ -1,24 +1,32 @@
 # Bare-Metal STM32 Motor Driver, PWM + ADC Control without HAL
 ![In Progress Badge](https://img.shields.io/badge/status-in%20progress-orange)  
-This project demonstrates a **bare-metal motor driver** using the **STM32 Nucleo-F401RE**, written in C with **PlatformIO and CMSIS** (no ArduinoIDE, no HAL, no CubeMX).
-The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor driver IC**, controlled by a potentiometer.
 
+A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, featuring **register-level** peripheral control, **analog sensor processing**, **hardware PWM generation**, and a **CLI interface** - all without HAL, CubeMX, or Arduino frameworks.
+
+## Control Behaviour 
 * Turn the potentiometer **left** - motor spins left / left LED brightens.
 * Turn the potentiometer **right** - motor spins right / right LED brightens.
-* Keep the potentiometer **centered** - motor stops / LEDs off.
+* Center potentiometer - motor stops / LEDs off.
+* CLI commands - full control and monitoring via serial interface.
 * Visualize motor speed with LED bar graph.
 
 ## Demo of Phase 1: Blinking an LED While Reading and printing the ADC value via USART2
 
 ![Phase1_BareMetalDriver(1)](https://github.com/user-attachments/assets/f69e2aad-3694-48d1-92f4-05018f8f1235)
 
-### Hardware
+### Preformance Metrics
+* **ADC Resolition**: 12-bit (0-495 values)
+* **PWM Frequency**: 100hz with 8 bit duty cycle resulution for cmooth control
+* **Sampling Rate**: 480-cycle sampling
+
+### Components Required
 * STM32 Nucleo-F401RE
 * L9110H motor driver IC
 * 1 kΩ potentiometer
 * Resistors (current limiting for LEDs)
 * 8 LEDs (for speed visualizer)
 * DC Motor (or 2 LEDs for final test)
+* Breadboard and jumper wires
 
 ### Roadmap
 **Phase 1: Basic**
@@ -31,8 +39,9 @@ The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor dri
  - [x] Map pot value to PWM duty cycle
  - [x] Drive LEDs with brightness proportional to pot position
 
-**Phase 3: LED Visualizer & Motor Integration**
- - [x] Implement **LED bar graph visualizer** (8–10 LEDs, showing direction + speed)  
+**Phase 3: LED Visualizer, CLI & Motor Integration**
+ - [x] Implement **LED bar graph visualizer** (8–10 LEDs, showing direction + speed)
+ - [x] Impliment CLI control
  - [ ] Replace LEDs with DC motor via L9110H  
  - [ ] Map pot input to motor direction (left/right) and speed (PWM duty cycle)
 
@@ -41,15 +50,20 @@ The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor dri
 #### Prerequisites
 * Ensure PlatformIO is installed. (Either via VSCode + PlatformIO plugin, or PlatformIO Core (CLI)).
 * Ensure toolchain and board support for STM32F401RE (CMSIS) is installed. PlatformIO should pull that.
+* Development Enviroment *platformio.ini*
+```
+# PlatformIO configuration (platformio.ini)
+[env:nucleo_f401re]
+platform = ststm32
+board = nucleo_f401re
+framework = cmsis
+upload_protocol = stlink
+monitor_speed = 115200
+```
 
 #### Setup
-1) Clone repo
-```
-git clone https://github.com/ChidumamAmadi-Obi/Bare-Metal-Motor-Driver.git
-cd Bare-Metal-Motor-Driver
-```
-2) Open in VSCode with PlatformIO
-3) Connect components as per wiring diagram
+1) Open in VSCode with PlatformIO
+2) Connect components as per wiring diagram
 ```
 _________________________
 - PWM Pins
@@ -69,11 +83,17 @@ LED_R1 = PC5
 LED_R2 = PC6
 LED_R3 = PC7
 ```
-4) Build and Upload with PlatformIO
+3) Clone, build and Flash
 ```
-pio run
-pio upload
+git clone https://github.com/ChidumamAmadi-Obi/Bare-Metal-Motor-Driver.git
+cd Bare-Metal-Motor-Driver
+pio run # Build project
+pio run --target upload # Upload to board
+pio device monitor # Monitor serial output
 ```
+5) Send and receive data via USART with PuTTY
+<img width="1919" height="544" alt="image" src="https://github.com/user-attachments/assets/b99d3a66-4c1f-478a-8ddf-148e24acd968" />
+ ^ example output of CLI
 
 ### References
 * [STM32F401RE Reference Manual (RM0368)](https://www.st.com/resource/en/reference_manual/rm0368-stm32f401xbc-and-stm32f401xde-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
