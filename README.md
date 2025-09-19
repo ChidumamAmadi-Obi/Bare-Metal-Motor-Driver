@@ -32,9 +32,9 @@ The goal is to drive a DC motor (or LEDs for testing) with an **L9110H motor dri
  - [x] Drive LEDs with brightness proportional to pot position
 
 **Phase 3: LED Visualizer & Motor Integration**
- - [ ] Implement **LED bar graph visualizer** (8–10 LEDs, showing direction + speed)  
+ - [x] Implement **LED bar graph visualizer** (8–10 LEDs, showing direction + speed)  
  - [ ] Replace LEDs with DC motor via L9110H  
- - [ ] Map pot input to motor direction (left/right) and speed (PWM duty cycle)  
+ - [ ] Map pot input to motor direction (left/right) and speed (PWM duty cycle)
 
 ### Getting Started
 
