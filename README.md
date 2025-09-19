@@ -10,9 +10,12 @@ A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, fe
 * CLI commands - full control and monitoring via serial interface.
 * Visualize motor speed with LED bar graph.
 
-## Demo of Phase 1: Blinking an LED While Reading and printing the ADC value via USART2
+## Demos 
+### Direction Control, PWM & LED Visualizer
+![IMG_2973-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/e9ab0777-c68f-48c7-974d-36f4139dba0c)
 
-![Phase1_BareMetalDriver(1)](https://github.com/user-attachments/assets/f69e2aad-3694-48d1-92f4-05018f8f1235)
+### CLI Demonstration
+![2025-09-19-193643-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/b5bf2980-ab52-4334-b76e-ebab79aabcd2)
 
 ### Preformance Metrics
 * **ADC Resolition**: 12-bit (0-495 values)
@@ -43,7 +46,6 @@ A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, fe
  - [x] Implement **LED bar graph visualizer** (8–10 LEDs, showing direction + speed)
  - [x] Impliment CLI control
  - [ ] Replace LEDs with DC motor via L9110H  
- - [ ] Map pot input to motor direction (left/right) and speed (PWM duty cycle)
 
 ### Getting Started
 
