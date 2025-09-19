@@ -60,7 +60,13 @@ platform = ststm32
 board = nucleo_f401re
 framework = cmsis
 upload_protocol = stlink
-monitor_speed = 115200
+debug_tool = stlink
+
+build_flags = 
+    -D STM32F401xE
+    -I include
+
+monitor_speed = 115200 ; Serial monitor configuration
 ```
 
 #### Setup
