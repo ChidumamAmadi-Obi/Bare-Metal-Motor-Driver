@@ -3,30 +3,59 @@
 
 #include "stm32f4xx.h"
 
+/*
+PWM Pins_________________________
+L9110 Pin 6 = D5
+L9110 Pin 7 = D6
+
+Analog_Input_Pin_________________
+ADC = PA0
+
+LED_Visualizer_Pins______________
+LED_L0 = PC0 left side
+LED_L1 = PC1
+LED_L2 = PC2
+LED_L3 = PC3
+LED_R0 = PC4 right side
+LED_R1 = PC5
+LED_R2 = PC6
+LED_R3 = PC7
+*/
+
 void enableClocks(void){
     // Clocks for PWM pins
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;       
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;        
-    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;        
+    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;       
+    
+    // Clock for GPIOC
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 }
 void configGPIO(void){ // each GPIO pin is configured with a separate clock and set to alternate function
-    // Configure D6 (PB10) as TIM2_CH3
+    // Configures D6 (PB10) with TIM2_CH3
     GPIOB->MODER &= ~GPIO_MODER_MODER10;       
     GPIOB->MODER |= GPIO_MODER_MODER10_1;      
     
-    GPIOB->AFR[1] &= ~GPIO_AFRH_AFSEL10;       
+    GPIOB->AFR[1] &= ~GPIO_AFRH_AFSEL10; // alternate function mode       
     GPIOB->AFR[1] |= (1 << 8);                 
     
-    // Configure D5 (PB4) as TIM3_CH1
+    // Configures D5 (PB4) with TIM3_CH1
     GPIOB->MODER &= ~GPIO_MODER_MODER4;        
     GPIOB->MODER |= GPIO_MODER_MODER4_1;       
     
     GPIOB->AFR[0] &= ~GPIO_AFRL_AFSEL4;        
-    GPIOB->AFR[0] |= (2 << 16);                
+    GPIOB->AFR[0] |= (2 << 16);        
+    
+    // Configures pins PC0-PC7 as outputs
+    for (uint8_t pin = 0; pin < 8; pin++) {
+        GPIOC->MODER = (GPIOC->MODER & ~(0x3 << (pin * 2))) | (0x1 << (pin * 2)); // clear and set mode to output
+        GPIOC->OSPEEDR &= ~(1 << pin); // Ser output type to push-pull
+    }
+    
 }
 
-void configureTimerPWM_D6(uint8_t dutyCycle) {
+void configTimerPWM_D6(uint8_t dutyCycle) {
     TIM2->CR1 &= ~TIM_CR1_CEN;                
     TIM2->PSC = 16 - 1;                       // 16MHz/16 = 1MHz timer clock
     TIM2->ARR = 400 - 1;                      // 40kHz/400 = 100Hz PWM frequency
@@ -36,11 +65,11 @@ void configureTimerPWM_D6(uint8_t dutyCycle) {
     TIM2->CCMR2 |= (6 << TIM_CCMR2_OC3M_Pos); 
     TIM2->CCMR2 |= TIM_CCMR2_OC3PE;           
     TIM2->CCER |= TIM_CCER_CC3E;               
-    TIM2->CCR3 = (400 * dutyCycle) / 255;                             
+    TIM2->CCR3 = (400 * dutyCycle) / 255; // sets duty cycle                
     TIM2->CR1 |= TIM_CR1_ARPE;                 
     TIM2->CR1 |= TIM_CR1_CEN;                 
 }
-void configureTimerPWM_D5(uint8_t dutyCycle) {
+void configTimerPWM_D5(uint8_t dutyCycle) {
     TIM3->CR1 &= ~TIM_CR1_CEN;          
     TIM3->PSC = 16 - 1;                       
     TIM3->ARR = 400 - 1;                     

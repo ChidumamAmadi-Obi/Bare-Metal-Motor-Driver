@@ -5,7 +5,12 @@
 #include <stdarg.h>
 #include "stm32f4xx.h"
 
+#define CMD_BUFFER_SIZE 64
 #define SystemCoreClock 16000000 // 16MHz in datasheet
+
+volatile char CMDBuffer[CMD_BUFFER_SIZE]; // holds incoming USART chars until the user hits ENTER (/r) or (/n)
+volatile uint8_t CMDIndex = 0;
+volatile uint8_t CMDReady = 0;
 
 void usart2Init(uint32_t baud_rate) { // Initialize USART2 with specified baud rate 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
@@ -15,7 +20,7 @@ void usart2Init(uint32_t baud_rate) { // Initialize USART2 with specified baud r
     GPIOA->MODER &= ~(GPIO_MODER_MODER2 | GPIO_MODER_MODER3);
     GPIOA->MODER |= (2 << GPIO_MODER_MODER2_Pos) | (2 << GPIO_MODER_MODER3_Pos);
     
-    // Sets alternate function to AF7 (USART2)
+    //Select USART2 as the Alternate Function
     GPIOA->AFR[0] &= ~(GPIO_AFRL_AFSEL2 | GPIO_AFRL_AFSEL3);
     GPIOA->AFR[0] |= (7 << GPIO_AFRL_AFSEL2_Pos) | (7 << GPIO_AFRL_AFSEL3_Pos);
     
@@ -75,7 +80,7 @@ void usart2SendHex(uint32_t num) {
 void usart2NewLine(void) {
     usart2SendString("\r\n");
 }
-static void simplePrintf(const char *format, va_list args) {
+void simplePrintf(const char *format, va_list args) {
     while (*format) {
         if (*format == '%') {
             format++;
@@ -117,4 +122,22 @@ void usart2Printf(const char *format, ...) {// Format and send string
     va_end(args);
 }
 
+void usart2IRQHandler() {
+    if (USART2 -> SR & USART_SR_RXNE) {
+        char c = USART2->DR; // reads char
+        
+        usart2SendChar(c); // Echo the character back to terminal
+        
+        if (c == '\r' || c == '\n') {  
+            CMDBuffer[CMDIndex] = '\0';  // null-terminate
+            CMDIndex = 0;
+            CMDReady = 1; // signal main loop
+            usart2NewLine(); 
+        } else {
+            if (CMDIndex < CMD_BUFFER_SIZE - 1) {
+                CMDBuffer[CMDIndex++] = c;
+            }
+        }
+    }
+}
 #endif 
