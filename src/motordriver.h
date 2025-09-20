@@ -6,13 +6,12 @@
 
 #include "stm32f4xx.h"
 
-
 #include <string.h>   // strtok, strcmp
 #include <stdlib.h>   // atoi
 #include <stddef.h>   // NULL
-
 #include <stdint.h>
 #include <stdbool.h>
+
 #include "usart.h"
 #include "adc.h"
 #include "gpio.h"
@@ -51,7 +50,7 @@ void systemInit(){
     usart2Printf("  System clock: %d Hz\r\n", SystemCoreClock);
 
     ADCInit(0);
-    usart2Printf("  ADC A0 Initialized\r\n");
+    usart2Printf("  ADC Pin PA0 Initialized\r\n");
 
     enableClocks();
     usart2Printf("  Clocks TIM2 and TIM3 configured\r\n");
@@ -78,7 +77,7 @@ void handleMotorConrtol(uint8_t motorSpeedL, uint8_t motorSpeedR){
     configTimerPWM_D5(motorSpeedR);
     configTimerPWM_D6(motorSpeedL);
 }
-void motorControl(uint16_t adcValue){
+void manualInput(uint16_t adcValue){
     if (adcValue > MIN_DEADBAND_THRESHOLD && adcValue < MAX_DEADBAND_THRESHOLD){ // if adc in deadband
         motorSpeedR = 0;
         motorSpeedL = 0;
@@ -149,43 +148,44 @@ void debug(uint16_t adcValue){
         speed = motorSpeedR; 
         direction = 'R';
     } else if (!power || (motorSpeedL == 0 && motorSpeedR == 0)) {
+        speed = 0;
         direction = 'N';
     }
     
-    usart2Printf("   Power       "); usart2Printf((power) ? "OFF\r\n" : "ON\r\n");
+    usart2Printf("   Power       "); usart2Printf((power) ? "ON\r\n" : "OFF\r\n");
     usart2Printf("            Control     "); usart2Printf((manualMode) ? "MANUAL\r\n" : "CLI\r\n");
     usart2Printf("            ADC Value   %d/4096\r\n", adcValue);
     usart2Printf("            Speed       %d/255\r\n", speed); 
     usart2Printf("            Direction   %c", direction);
 
 }
-void commandParser(uint16_t adcValue, char *input) { // small command parser for CLI control
+void CLIcommandParser(uint16_t adcValue, char *input) { // small command parser for CLI control
     char *cmd = strtok(input, " ");
     char *arg1 = strtok(NULL," ");
     char *arg2 = strtok(NULL," ");
     char *arg3 = strtok(NULL," ");
     char *arg4 = strtok(NULL," ");
-    if (cmd == NULL) usart2Printf("ERROR: Empty command\r\n\n");
+    if (cmd == NULL) usart2Printf("\nERROR: Empty command\r\n\n");
     if (strcmp(cmd, "MANUAL") == 0 && arg1) {
         if (strcmp(arg1, "OFF") == 0) {
             manualMode = 0;
-            usart2Printf("STM32 -> Manual control disabled. Motor now controlled via CLI.\r\n\n");
+            usart2Printf("\nSTM32 -> Manual control disabled. Motor now controlled via CLI.\r\n\n");
         } else if ( strcmp(arg1, "ON") == 0) {
             manualMode = 1;
-            usart2Printf("STM32 -> Manual control enabled. Motor now controlled via potentiometer.\r\n\n");
+            usart2Printf("\nSTM32 -> Manual control enabled. Motor now controlled via potentiometer.\r\n\n");
         } else {
-            usart2Printf("STM32 -> ERROR: Invalid MANUAL argument. Use ON or OFF.\r\n\n");
+            usart2Printf("\nSTM32 -> ERROR: Invalid MANUAL argument. Use ON or OFF.\r\n\n");
         }
 
     } else if (strcmp(cmd, "STATUS") == 0) {
-        usart2Printf("STM32 -> ");
+        usart2Printf("\nSTM32 -> ");
         debug(adcValue);
         usart2Printf("\r\n\n");
 
     } else if (strcmp(cmd, "SET") == 0 && arg1 && strcmp(arg1, "SPEED") == 0 && arg2 && arg3 && strcmp(arg3, "DIR") == 0 && arg4) {
         if (!manualMode) {
             speed = atoi(arg2);
-            usart2Printf("STM32 -> Speed set to %d, Direction set to ", speed);
+            usart2Printf("\nSTM32 -> Speed set to %d, Direction set to ", speed);
             if (speed <= 255 && speed >= 0) {
                 if (strcmp(arg4, "L") == 0) {
                     motorSpeedL = 0;
@@ -198,29 +198,28 @@ void commandParser(uint16_t adcValue, char *input) { // small command parser for
                     usart2Printf("Right\r\n\n");
 
                 } else {
-                    usart2Printf("STM32 -> ERROR: Invalid motor direction. Use L (Left), R (Right), or N (OFF).\r\n\n");
+                    usart2Printf("\nSTM32 -> ERROR: Invalid motor direction. Use L (Left), R (Right), or N (OFF).\r\n\n");
                 }
             } else {
-                usart2Printf("STM32 -> ERROR: Speed set out of bounds, (0-255)\r\n\n");
+                usart2Printf("\nSTM32 -> ERROR: Speed set out of bounds, (0-255)\r\n\n");
             }
         } else {
-            usart2Printf("STM32 -> ERROR: Turn manual mode off before CLI motor control!\r\n\n");
+            usart2Printf("\nSTM32 -> ERROR: Turn manual mode off before CLI motor control!\r\n\n");
         }
 
     } else if (strcmp(cmd, "POWER") == 0) {
         if (strcmp(arg1, "OFF") == 0) {
-            usart2Printf("STM32 -> Motors powered off.\r\n\n");
-            motorSpeedL = 0;
-            motorSpeedR = 0;
+            usart2Printf("\nSTM32 -> Motors powered off.\r\n\n");
+            handleMotorConrtol(0,0);
             power = 0;
         } else if (strcmp(arg1, "ON") == 0) {
-            usart2Printf("STM32 -> Motors powered on.\r\n\n");
+            usart2Printf("\nSTM32 -> Motors powered on.\r\n\n");
             power = 1;
         } else {
-            usart2Printf("STM32 -> ERROR: Invalid power argument, use ON or OFF\r\n\n");
+            usart2Printf("\nSTM32 -> ERROR: Invalid power argument, use ON or OFF\r\n\n");
         }
     } else if (strcmp(cmd, "HELP") == 0) {
-        usart2Printf("STM32 -> Availible commands:\r\n");
+        usart2Printf("\nSTM32 -> Availible commands:\r\n");
         usart2Printf("      HELP                Show this message\r\n");
         usart2Printf("      STATUS              Show current motor speed, direction, and potentiometer adc value\r\n");
         usart2Printf("      SET SPEED x DIR x   Set motor speed and direction, (1-254), L (Left), R (Right), or N (OFF) \r\n");
@@ -228,7 +227,7 @@ void commandParser(uint16_t adcValue, char *input) { // small command parser for
         usart2Printf("      MANUAL x            Enables/Disables manual motor control via potentiometer, Use ON, or OFF\r\n\n");
 
     } else {
-        usart2Printf("STM32 -> ERROR: Invalid command. Type 'HELP' for more information.\r\n\n");
+        usart2Printf("\nSTM32 -> ERROR: Invalid command. Type 'HELP' for more information.\r\n\n");
     }
 }
 

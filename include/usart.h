@@ -7,6 +7,7 @@
 
 #define CMD_BUFFER_SIZE 100
 #define SystemCoreClock 16000000 // 16MHz in datasheet
+#define BACKSPACE_KEY 0x7F
 
 volatile char CMDBuffer[CMD_BUFFER_SIZE]; // holds incoming USART chars until the user hits ENTER (/r) or (/n)
 volatile uint8_t CMDIndex = 0;
@@ -126,8 +127,11 @@ void usart2IRQHandler() {
     if (USART2 -> SR & USART_SR_RXNE) {
         char c = USART2->DR; // reads char
         usart2SendChar(c); // Echo the character back to terminal
-        
-        if (c == '\r' || c == '\n') {  
+        if (c == 0x7F) {
+            if (CMDIndex > 0) {
+                CMDIndex--;
+            }
+        } else if (c == '\r' || c == '\n') {  
             CMDBuffer[CMDIndex] = '\0';  // null-terminate
             CMDIndex = 0;
             CMDReady = 1; 
