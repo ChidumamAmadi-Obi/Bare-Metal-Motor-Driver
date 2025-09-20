@@ -1,6 +1,4 @@
 # Bare-Metal STM32 Motor Driver, PWM + ADC Control without HAL
-![In Progress Badge](https://img.shields.io/badge/status-in%20progress-orange)  
-
 A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, featuring **register-level** peripheral control, **analog sensor processing**, **hardware PWM generation**, and a **CLI interface** - all without HAL, CubeMX, or Arduino frameworks.
 
 ## Demos 
