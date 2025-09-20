@@ -32,7 +32,7 @@ void enableClocks(void){
     // Clock for GPIOC
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
 }
-void configGPIO(void){ // each GPIO pin is configured with a separate clock and set to alternate function
+void configGPIO(void){ // each PWM enabled GPIO pin is configured with a separate clock 
     // Configures D6 (PB10) with TIM2_CH3
     GPIOB->MODER &= ~GPIO_MODER_MODER10;       
     GPIOB->MODER |= GPIO_MODER_MODER10_1;      
@@ -52,7 +52,6 @@ void configGPIO(void){ // each GPIO pin is configured with a separate clock and 
         GPIOC->MODER = (GPIOC->MODER & ~(0x3 << (pin * 2))) | (0x1 << (pin * 2)); // clear and set mode to output
         GPIOC->OSPEEDR &= ~(1 << pin); // Ser output type to push-pull
     }
-    
 }
 
 void configTimerPWM_D6(uint8_t dutyCycle) {

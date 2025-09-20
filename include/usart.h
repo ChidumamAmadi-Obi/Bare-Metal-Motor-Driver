@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include "stm32f4xx.h"
 
-#define CMD_BUFFER_SIZE 64
+#define CMD_BUFFER_SIZE 100
 #define SystemCoreClock 16000000 // 16MHz in datasheet
 
 volatile char CMDBuffer[CMD_BUFFER_SIZE]; // holds incoming USART chars until the user hits ENTER (/r) or (/n)
@@ -125,13 +125,12 @@ void usart2Printf(const char *format, ...) {// Format and send string
 void usart2IRQHandler() {
     if (USART2 -> SR & USART_SR_RXNE) {
         char c = USART2->DR; // reads char
-        
         usart2SendChar(c); // Echo the character back to terminal
         
         if (c == '\r' || c == '\n') {  
             CMDBuffer[CMDIndex] = '\0';  // null-terminate
             CMDIndex = 0;
-            CMDReady = 1; // signal main loop
+            CMDReady = 1; 
             usart2NewLine(); 
         } else {
             if (CMDIndex < CMD_BUFFER_SIZE - 1) {

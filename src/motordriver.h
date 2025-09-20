@@ -19,8 +19,11 @@
 
 uint8_t motorSpeedL;
 uint8_t motorSpeedR;
+uint8_t speed;
+char direction;
 
 bool manualMode = 1;
+bool power = 1;
 
 // Timing functions
 void SysTickInit(void) { // for more accurate delay func
@@ -43,21 +46,27 @@ void delayMs(uint32_t ms) {
 void systemInit(){
     SysTickInit();
     usart2Init(115200);
-    usart2Printf("USART2 Initialized...\r\n");
-    usart2Printf("System clock: %d Hz\r\n", SystemCoreClock);
+    usart2Printf("==================================================\r\n");
+    usart2Printf("  USART2 Initialized\r\n");
+    usart2Printf("  System clock: %d Hz\r\n", SystemCoreClock);
 
-    ADCInit();
-    usart2Printf("ADC A0 Initialized...\r\n");
+    ADCInit(0);
+    usart2Printf("  ADC A0 Initialized\r\n");
 
     enableClocks();
-    usart2Printf("Clocks TIM2 and TIM3 configured...\r\n");
+    usart2Printf("  Clocks TIM2 and TIM3 configured\r\n");
+    usart2Printf("  Clocks for GPIO ports A, B and C configured\r\n");
 
     configGPIO();
-    usart2Printf("GPIO Pins D5 and D6 configured...\r\n");
+    usart2Printf("  GPIO Pins D5 and D6 configured\r\n");
 
     configTimerPWM_D6(0); // D6 and D5 with TIM2 and TIM3 - 10Hz, 0% duty cycle
     configTimerPWM_D5(0);
-    usart2Printf("Starting D6 and D5 on 0 percent duty cycle...\r\n");
+    usart2Printf("  Starting D6 and D5 on 0 percent duty cycle...\r");
+    usart2Printf("--------------------------------------------------\r\n");
+    usart2Printf("  Manual Mode enabled, control via potentiometer\r\n");
+    usart2Printf("  Type 'HELP' for CLI information\r\n");
+    usart2Printf("==================================================\r\n\n");
     configureOnBoardLED();
 }
 
@@ -133,7 +142,22 @@ void handleLEDVisualizer(){
 }
 
 void debug(uint16_t adcValue){
-    usart2Printf("Manual %d, ADC Value %d, Motor Speed (Left)%d/255 (Right)%d/255\r\n",manualMode, adcValue, motorSpeedL, motorSpeedR);
+    if (motorSpeedL > 0) {
+        speed = motorSpeedL;
+        direction = 'L';
+    } else if (motorSpeedR > 0) {
+        speed = motorSpeedR; 
+        direction = 'R';
+    } else if (!power || (motorSpeedL == 0 && motorSpeedR == 0)) {
+        direction = 'N';
+    }
+    
+    usart2Printf("   Power       "); usart2Printf((power) ? "OFF\r\n" : "ON\r\n");
+    usart2Printf("            Control     "); usart2Printf((manualMode) ? "MANUAL\r\n" : "CLI\r\n");
+    usart2Printf("            ADC Value   %d/4096\r\n", adcValue);
+    usart2Printf("            Speed       %d/255\r\n", speed); 
+    usart2Printf("            Direction   %c", direction);
+
 }
 void commandParser(uint16_t adcValue, char *input) { // small command parser for CLI control
     char *cmd = strtok(input, " ");
@@ -160,53 +184,52 @@ void commandParser(uint16_t adcValue, char *input) { // small command parser for
 
     } else if (strcmp(cmd, "SET") == 0 && arg1 && strcmp(arg1, "SPEED") == 0 && arg2 && arg3 && strcmp(arg3, "DIR") == 0 && arg4) {
         if (!manualMode) {
-            uint8_t motorSpeed = atoi(arg2);
-            usart2Printf("STM32 -> Speed set to %d, Direction set to ", motorSpeed);
-            if (motorSpeed < 255 && motorSpeed > 0) {
+            speed = atoi(arg2);
+            usart2Printf("STM32 -> Speed set to %d, Direction set to ", speed);
+            if (speed <= 255 && speed >= 0) {
                 if (strcmp(arg4, "L") == 0) {
                     motorSpeedL = 0;
-                    motorSpeedR = motorSpeed;
+                    motorSpeedR = speed;
                     usart2Printf("Left\r\n\n");
 
                 } else if (strcmp(arg4, "R") == 0) {
-                    motorSpeedL = motorSpeed;
+                    motorSpeedL = speed;
                     motorSpeedR = 0;
                     usart2Printf("Right\r\n\n");
-
-                } else if (strcmp(arg4, "N") == 0) {
-                    motorSpeedL = 0;
-                    motorSpeedR = 0;
-                    usart2Printf("None\r\n\n");
 
                 } else {
                     usart2Printf("STM32 -> ERROR: Invalid motor direction. Use L (Left), R (Right), or N (OFF).\r\n\n");
                 }
             } else {
-                usart2Printf("STM32 -> ERROR: Speed set out of bounds\r\n\n");
+                usart2Printf("STM32 -> ERROR: Speed set out of bounds, (0-255)\r\n\n");
             }
         } else {
             usart2Printf("STM32 -> ERROR: Turn manual mode off before CLI motor control!\r\n\n");
         }
 
+    } else if (strcmp(cmd, "POWER") == 0) {
+        if (strcmp(arg1, "OFF") == 0) {
+            usart2Printf("STM32 -> Motors powered off.\r\n\n");
+            motorSpeedL = 0;
+            motorSpeedR = 0;
+            power = 0;
+        } else if (strcmp(arg1, "ON") == 0) {
+            usart2Printf("STM32 -> Motors powered on.\r\n\n");
+            power = 1;
+        } else {
+            usart2Printf("STM32 -> ERROR: Invalid power argument, use ON or OFF\r\n\n");
+        }
     } else if (strcmp(cmd, "HELP") == 0) {
         usart2Printf("STM32 -> Availible commands:\r\n");
         usart2Printf("      HELP                Show this message\r\n");
         usart2Printf("      STATUS              Show current motor speed, direction, and potentiometer adc value\r\n");
         usart2Printf("      SET SPEED x DIR x   Set motor speed and direction, (1-254), L (Left), R (Right), or N (OFF) \r\n");
+        usart2Printf("      POWER x             Powers motors on or off, ON/OFF \r\n");
         usart2Printf("      MANUAL x            Enables/Disables manual motor control via potentiometer, Use ON, or OFF\r\n\n");
 
     } else {
         usart2Printf("STM32 -> ERROR: Invalid command. Type 'HELP' for more information.\r\n\n");
     }
 }
-
-/*
-Available CLI commands:
- - HELP                 Show this message
- - STATUS               Show motor state and sensor values
- - SET SPEED x          Set motor speed (0-255)
- - SET DIR L/R          Set motor direction
- - MANUAL 
-*/
 
 #endif
