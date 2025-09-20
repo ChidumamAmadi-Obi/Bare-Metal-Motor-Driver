@@ -17,11 +17,6 @@ A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, fe
 ### CLI Demonstration
 ![2025-09-19-193643-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/b5bf2980-ab52-4334-b76e-ebab79aabcd2)
 
-### Preformance Metrics
-* **ADC Resolition**: 12-bit (0-495 values)
-* **PWM Frequency**: 100hz with 8 bit duty cycle resulution for cmooth control
-* **Sampling Rate**: 480-cycle sampling
-
 ### Components Required
 * STM32 Nucleo-F401RE
 * L9110H motor driver IC
@@ -71,27 +66,7 @@ monitor_speed = 115200 ; Serial monitor configuration
 
 #### Setup
 1) Open in VSCode with PlatformIO
-2) Connect components as per wiring diagram
-```
-_________________________
-- PWM Pins
-L9110 Pin 6 = D5 or PB14
-L9110 Pin 7 = D6 or PB15
-_________________________
-- Analog Input Pin
-ADC = PA0
-_________________________
-- LED Visualizer Pins
-LED_L0 = PC0 left side
-LED_L1 = PC1
-LED_L2 = PC2
-LED_L3 = PC3
-LED_R0 = PC4 right side
-LED_R1 = PC5
-LED_R2 = PC6
-LED_R3 = PC7
-```
-3) Clone, build and Flash
+2) Clone, build and Flash
 ```
 git clone https://github.com/ChidumamAmadi-Obi/Bare-Metal-Motor-Driver.git
 cd Bare-Metal-Motor-Driver
@@ -99,7 +74,7 @@ pio run # Build project
 pio run --target upload # Upload to board
 pio device monitor # Monitor serial output
 ```
-5) Send and receive data via USART with PuTTY
+3) Send and receive data via USART with PuTTY
 <img width="1919" height="544" alt="image" src="https://github.com/user-attachments/assets/b99d3a66-4c1f-478a-8ddf-148e24acd968" />
  ^ example output of CLI
 
