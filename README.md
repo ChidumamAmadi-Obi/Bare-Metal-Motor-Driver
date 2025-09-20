@@ -3,13 +3,6 @@
 
 A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, featuring **register-level** peripheral control, **analog sensor processing**, **hardware PWM generation**, and a **CLI interface** - all without HAL, CubeMX, or Arduino frameworks.
 
-## Control Behaviour 
-* Turn the potentiometer **left** - motor spins left / left LED brightens.
-* Turn the potentiometer **right** - motor spins right / right LED brightens.
-* Center potentiometer - motor stops / LEDs off.
-* CLI commands - full control and monitoring via serial interface.
-* Visualize motor speed with LED bar graph.
-
 ## Demos 
 ### Direction Control, PWM & LED Visualizer
 ![IMG_2973-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/e9ab0777-c68f-48c7-974d-36f4139dba0c)
@@ -17,7 +10,23 @@ A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, fe
 ### CLI Demonstration
 ![2025-09-19-193643-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/b5bf2980-ab52-4334-b76e-ebab79aabcd2)
 
-### Components Required
+## Features
+* **Bare-Metal Efficiency:** Direct register access for optimal preformance and control.
+* **Dual Control Modes:**
+   * **Manual Mode:** Motor speed/direction controlled by a potentiometer.
+   * **CLI Mode:** Full control via a serial terminal (e.g. 'SET SPEED 200 DIR L'). 
+* **Real-Time Visual Feedback:** 8-LED bar graph visually displays motor speed and direction.
+* **Robust CLI Parser:** Handles commands like 'STATUS', 'HELP', 'MANUAL ON/OFF', and custom speed/direction settings.
+* **Professional Software Design:** Modular drivers for USART, ADC, GPIO, and Timers.
+
+## Control Behaviour 
+* Turn the potentiometer **left** - motor spins left / left LED brightens.
+* Turn the potentiometer **right** - motor spins right / right LED brightens.
+* Center potentiometer - motor stops / LEDs off.
+* CLI commands - full control and monitoring via serial interface.
+* Visualize motor speed with LED bar graph.
+
+### Hardware Setup
 * STM32 Nucleo-F401RE
 * L9110H motor driver IC
 * 1 kΩ potentiometer
@@ -25,6 +34,18 @@ A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, fe
 * 8 LEDs (for speed visualizer)
 * DC Motor (or 2 LEDs for final test)
 * Breadboard and jumper wires
+
+## Wiring Diagram
+<img width="787" height="594" alt="image" src="https://github.com/user-attachments/assets/9ac8df23-5357-4253-891a-04f386074f72" />
+
+| STM32 Pin | Peripheral | Connects To |
+| :--- | :--- | :--- |
+| PA0 | ADC Input | Potentiometer Output |
+| PA2, PA3 | USART2 (TX, RX) | USB-to-Serial Converter |
+| PB4 (D5) | TIM3_CH1 | L9110H B-IA |
+| PB10 (D6) | TIM2_CH3 | L9110H A-IA |
+| PC0-PC7 | GPIO Output | LED Anodes (through resistors) |
+
 
 ### Roadmap
 **Phase 1: Basic**
@@ -74,7 +95,10 @@ pio run # Build project
 pio run --target upload # Upload to board
 pio device monitor # Monitor serial output
 ```
-3) Send and receive data via USART with PuTTY
+3) Connect to CLI by opening a serial monitor (PlatformIO, PuTTY, Tera Term, etc).
+* Set baud rate to **115200**
+* Type 'HELP to see all availible commands.
+
 <img width="1919" height="544" alt="image" src="https://github.com/user-attachments/assets/b99d3a66-4c1f-478a-8ddf-148e24acd968" />
  ^ example output of CLI
 
