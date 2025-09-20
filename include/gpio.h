@@ -3,25 +3,6 @@
 
 #include "stm32f4xx.h"
 
-/*
-PWM Pins_________________________
-L9110 Pin 6 = D5
-L9110 Pin 7 = D6
-
-Analog_Input_Pin_________________
-ADC = PA0
-
-LED_Visualizer_Pins______________
-LED_L0 = PC0 left side
-LED_L1 = PC1
-LED_L2 = PC2
-LED_L3 = PC3
-LED_R0 = PC4 right side
-LED_R1 = PC5
-LED_R2 = PC6
-LED_R3 = PC7
-*/
-
 void enableClocks(void){
     // Clocks for PWM pins
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       

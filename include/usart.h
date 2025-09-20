@@ -4,10 +4,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include "stm32f4xx.h"
-
-#define CMD_BUFFER_SIZE 100
-#define SystemCoreClock 16000000 // 16MHz in datasheet
-#define BACKSPACE_KEY 0x7F
+#include "config.h"
 
 volatile char CMDBuffer[CMD_BUFFER_SIZE]; // holds incoming USART chars until the user hits ENTER (/r) or (/n)
 volatile uint8_t CMDIndex = 0;
@@ -127,7 +124,7 @@ void usart2IRQHandler() {
     if (USART2 -> SR & USART_SR_RXNE) {
         char c = USART2->DR; // reads char
         usart2SendChar(c); // Echo the character back to terminal
-        if (c == 0x7F) {
+        if (c == BACKSPACE_KEY) {
             if (CMDIndex > 0) {
                 CMDIndex--;
             }

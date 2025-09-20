@@ -1,9 +1,6 @@
 #ifndef MOTOR_CONTROL_H
 #define MOTOR_CONTROL_H
 
-#define MIN_DEADBAND_THRESHOLD 1048
-#define MAX_DEADBAND_THRESHOLD 3048
-
 #include "stm32f4xx.h"
 
 #include <string.h>   // strtok, strcmp
@@ -12,14 +9,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "config.h"
 #include "usart.h"
 #include "adc.h"
 #include "gpio.h"
 
-uint8_t motorSpeedL;
-uint8_t motorSpeedR;
-uint8_t speed;
-char direction;
+static uint8_t motorSpeedL;
+static uint8_t motorSpeedR;
+static uint8_t speed;
+static char direction;
 
 bool manualMode = 1;
 bool power = 1;
@@ -96,6 +94,11 @@ void handleLEDVisualizer(){
     uint8_t LEDBarGraphL = map(motorSpeedL,0,255,1,4);
     uint8_t LEDBarGraphR = map(motorSpeedR,0,255,1,4);
 
+    if ( !power ) {
+        motorSpeedL = 0;
+        motorSpeedR = 0;
+    }
+    
     if ( motorSpeedL == 0 ) LEDBarGraphL = 0;
     if ( motorSpeedR == 0 ) LEDBarGraphR = 0;
 
@@ -222,7 +225,7 @@ void CLIcommandParser(uint16_t adcValue, char *input) { // small command parser 
         usart2Printf("\nSTM32 -> Availible commands:\r\n");
         usart2Printf("      HELP                Show this message\r\n");
         usart2Printf("      STATUS              Show current motor speed, direction, and potentiometer adc value\r\n");
-        usart2Printf("      SET SPEED x DIR x   Set motor speed and direction, (1-254), L (Left), R (Right), or N (OFF) \r\n");
+        usart2Printf("      SET SPEED x DIR x   Set motor speed and direction, (0-255), L (Left), R (Right), or N (OFF) \r\n");
         usart2Printf("      POWER x             Powers motors on or off, ON/OFF \r\n");
         usart2Printf("      MANUAL x            Enables/Disables manual motor control via potentiometer, Use ON, or OFF\r\n\n");
 

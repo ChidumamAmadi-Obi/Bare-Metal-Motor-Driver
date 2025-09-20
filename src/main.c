@@ -3,8 +3,9 @@
 int main() {
     systemInit();
     while(1) {
-        usart2IRQHandler();  // processes incoming characters from cli
         uint16_t adcVal = ADCRead(0); 
+        usart2IRQHandler();
+        
         if (CMDReady) {
             CLIcommandParser(adcVal, (char*)CMDBuffer);
             CMDReady = 0;

@@ -2,8 +2,9 @@
 #define ADC_H
 
 #include "stm32f4xx.h"
+#include "config.h"
 
-static const uint8_t pinToChannel[] = {
+const uint8_t pinToChannel[] = {
     0, // PA0 - ADC1_IN0
     1, // PA1 - ADC1_IN1
     2, // PA2 - ADC1_IN2
