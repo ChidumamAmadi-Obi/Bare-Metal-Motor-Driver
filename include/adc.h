@@ -43,8 +43,8 @@ uint16_t ADCRead(uint8_t pin) {
         for(volatile int i = 0; i < 100; i++); // Small delay
     }
     ADC1->CR2 |= ADC_CR2_SWSTART;           
-    while(!(ADC1->SR & ADC_SR_EOC));        
-    return ADC1->DR;                       
+    while(!(ADC1->SR & ADC_SR_EOC));
+    return ADC1->DR;
 }
 
 #endif

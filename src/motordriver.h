@@ -24,23 +24,6 @@ bool manualMode = 1;
 bool power = 1;
 bool monitorMode = 0;
 
-// Timing functions
-void SysTickInit(void) { // for more accurate delay func
-    SysTick->LOAD = SystemCoreClock/1000 - 1;  // 1 ms period
-    SysTick->VAL = 0;
-    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | 
-                   SysTick_CTRL_ENABLE_Msk;
-}
-void delayMs(uint32_t ms) {
-    uint32_t start = SysTick->VAL;
-    for (uint32_t i = 0; i < ms; i++) {
-    
-        while (start <= SysTick->VAL);// Wait until the SysTick counter wraps around
-        while (start > SysTick->VAL);
-        start = SysTick->VAL;
-    }
-}
-
 // Initlalize system
 void systemInit(){
     SysTickInit();
@@ -158,6 +141,7 @@ void handleLEDVisualizer(){
     }
 }
 
+// CLI functions
 void monitorADC(uint8_t adcValue) {
     if ( speed != prevSpeed ) {
         usart2Printf("\nADC Value: %d Speed: %d%%\r\n", adcValue, speed);

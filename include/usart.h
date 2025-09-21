@@ -145,4 +145,5 @@ void USART2_IRQHandler() { // gets called automatically when character is receiv
         }
     }
 }
-#endif 
+
+#endif
