@@ -45,7 +45,7 @@ void configTimerPWM_D6(uint8_t dutyCycle) {
     TIM2->CCMR2 |= (6 << TIM_CCMR2_OC3M_Pos); 
     TIM2->CCMR2 |= TIM_CCMR2_OC3PE;           
     TIM2->CCER |= TIM_CCER_CC3E;               
-    TIM2->CCR3 = (400 * dutyCycle) / 255; // sets duty cycle                
+    TIM2->CCR3 = (400 * dutyCycle) / 100; // sets duty cycle                
     TIM2->CR1 |= TIM_CR1_ARPE;                 
     TIM2->CR1 |= TIM_CR1_CEN;                 
 }
@@ -59,7 +59,7 @@ void configTimerPWM_D5(uint8_t dutyCycle) {
     TIM3->CCMR1 |= (6 << TIM_CCMR1_OC1M_Pos);  
     TIM3->CCMR1 |= TIM_CCMR1_OC1PE;           
     TIM3->CCER |= TIM_CCER_CC1E;              
-    TIM3->CCR1 = (400 * dutyCycle) / 255;                           
+    TIM3->CCR1 = (400 * dutyCycle) / 100;                           
     TIM3->CR1 |= TIM_CR1_ARPE;                 
     TIM3->CR1 |= TIM_CR1_CEN;                 
 }

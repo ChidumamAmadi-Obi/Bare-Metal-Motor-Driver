@@ -24,8 +24,11 @@ void usart2Init(uint32_t baud_rate) { // Initialize USART2 with specified baud r
     
     // Configures USART2
     USART2->BRR = SystemCoreClock / baud_rate;
-    USART2->CR1 = USART_CR1_TE | USART_CR1_RE;  
-    USART2->CR1 |= USART_CR1_UE;               
+    USART2->CR1 = USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;   
+    USART2->CR1 |= USART_CR1_UE;
+    
+    NVIC_SetPriority(USART2_IRQn, 0);
+    NVIC_EnableIRQ(USART2_IRQn);  // enables interrupt    
 }
 void usart2SendChar(char c) {
     while (!(USART2->SR & USART_SR_TXE)); 
@@ -120,19 +123,21 @@ void usart2Printf(const char *format, ...) {// Format and send string
     va_end(args);
 }
 
-void usart2IRQHandler() {
+void USART2_IRQHandler() { // gets called automatically when character is received
     if (USART2 -> SR & USART_SR_RXNE) {
         char c = USART2->DR; // reads char
         usart2SendChar(c); // Echo the character back to terminal
-        if (c == BACKSPACE_KEY) {
+        if (c == ASCII_BACKSPACE) {
             if (CMDIndex > 0) {
                 CMDIndex--;
             }
-        } else if (c == '\r' || c == '\n') {  
+        } else if (c == '\r') {  
             CMDBuffer[CMDIndex] = '\0';  // null-terminate
             CMDIndex = 0;
             CMDReady = 1; 
             usart2NewLine(); 
+        } else if ( c == '\n') {
+            //ignore 
         } else {
             if (CMDIndex < CMD_BUFFER_SIZE - 1) {
                 CMDBuffer[CMDIndex++] = c;
