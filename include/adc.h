@@ -55,12 +55,13 @@ void ADCInit(uint8_t pin) {
 uint16_t ADCRead(uint8_t pin) {
     if (ADC1->SQR3 != pinToChannel[pin]) { // Updates the channel if different from current
         ADC1->SQR3 = pinToChannel[pin];
-        for(volatile int i = 0; i < 100; i++); // Small delay
+        delayMs(1);
     }
     ADC1->CR2 |= ADC_CR2_SWSTART;           
     while(!(ADC1->SR & ADC_SR_EOC));
     uint16_t rawadc = ADC1->DR;
     return getAvg(rawadc);
 }
+
 
 #endif
