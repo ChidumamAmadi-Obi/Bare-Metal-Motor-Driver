@@ -15,6 +15,18 @@ const uint8_t pinToChannel[] = {
     7  // PA7 - ADC1_IN7
 };
 
+static uint16_t adcReadings[NUMREADINGS];
+static uint16_t readIndex = 0;
+static uint16_t total = 0;
+
+uint16_t getAvg( uint16_t reading ) {
+    total = total - adcReadings[readIndex]; 
+    adcReadings[readIndex] = reading;
+    total = total + adcReadings[readIndex];
+    readIndex++;
+    if (readIndex >= NUMREADINGS) readIndex = 0;
+    return (uint16_t)(total / NUMREADINGS);
+}
 static void configureAnalogGPIO(uint8_t pin) {
     GPIOA->MODER |= (0x3 << (2 * pin));  // Configure pin as analog mode 
     GPIOA->PUPDR &= ~(0x3 << (2 * pin)); // Disable pull-up/pull-down
@@ -36,6 +48,9 @@ void ADCInit(uint8_t pin) {
     ADC1->CR2 |= ADC_CR2_ADON;            
     
     for(volatile int i = 0; i < 1000; i++); // Wait for ADC to stabilize
+
+    for (int i = 0; i < NUMREADINGS; i++) adcReadings[i] = 0; // initialize all readings to 0
+
 }
 uint16_t ADCRead(uint8_t pin) {
     if (ADC1->SQR3 != pinToChannel[pin]) { // Updates the channel if different from current
@@ -44,7 +59,8 @@ uint16_t ADCRead(uint8_t pin) {
     }
     ADC1->CR2 |= ADC_CR2_SWSTART;           
     while(!(ADC1->SR & ADC_SR_EOC));
-    return ADC1->DR;
+    uint16_t rawadc = ADC1->DR;
+    return getAvg(rawadc);
 }
 
 #endif

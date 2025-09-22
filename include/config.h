@@ -3,10 +3,10 @@
 
 #include "stm32f4xx.h"
 
-#define CMD_BUFFER_SIZE 100
+#define CMD_BUFFER_SIZE 30
 #define SystemCoreClock 16000000 // 16MHz in datasheet
 
-#define SAMPLE_COUNT 10 // for averaging adc vals
+#define NUMREADINGS 15 // for averaging adc vals
 
 #define ASCII_BACKSPACE 0x7F // used in puTTy's terminal
 #define ASCII_ESC 0x1B
