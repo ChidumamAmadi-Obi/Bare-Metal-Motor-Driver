@@ -55,7 +55,7 @@ monitor_speed = 115200 ; Serial monitor configuration
 * Breadboard and jumper wires
 
 ## Wiring Diagram
-<img width="787" height="594" alt="image" src="https://github.com/user-attachments/assets/9ac8df23-5357-4253-891a-04f386074f72" />
+<img width="960" height="726" alt="image" src="https://github.com/user-attachments/assets/4e092f7e-d035-4e28-b9d7-7e0af5d8cbf4" />
 
 | STM32 Pin | Peripheral | Connects To |
 | :--- | :--- | :--- |
