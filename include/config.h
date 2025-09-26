@@ -16,8 +16,10 @@
 #define ASCII_RIGHT 0x43
 #define ASCII_LEFT 0x44
 
-#define MIN_DEADBAND_THRESHOLD 1048
+#define MIN_DEADBAND_THRESHOLD 1048 // adc values for deadband
 #define MAX_DEADBAND_THRESHOLD 3048
+#define MAX_LEFT 32 // top left spinning speed at adc value 35
+#define MAX_RIGHT 4096 // top right spinning speed at adc value 4096
 
 // Timing functions
 void SysTickInit(void) { // for more accurate delay func

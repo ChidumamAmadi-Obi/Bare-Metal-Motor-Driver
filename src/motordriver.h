@@ -14,8 +14,6 @@
 #include "adc.h"
 #include "gpio.h"
 
-static uint8_t motorSpeedL;
-static uint8_t motorSpeedR;
 static uint8_t prevSpeed = 0;
 static uint8_t speed;
 static char direction;
@@ -56,48 +54,49 @@ void systemInit(){
 inline uint16_t map(uint16_t x, uint16_t in_min, uint16_t in_max, uint16_t out_min, uint16_t out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-void handleMotorConrtol(uint8_t motorSpeedL, uint8_t motorSpeedR){
+void handleMotorConrtol(){
     if (power) {
-        configTimerPWM_D5(motorSpeedL);
-        configTimerPWM_D6(motorSpeedR); 
+        if (direction == 'L') {
+            configTimerPWM_D5(speed);
+            configTimerPWM_D6(0);
+        } else if (direction == 'R') {
+            configTimerPWM_D5(0);
+            configTimerPWM_D6(speed);
+        }
     } else {
+        speed = 0;
+        direction = 'N';
         configTimerPWM_D5(0);
         configTimerPWM_D6(0); 
-    }
-    
+    }    
 }
 void manualInputReceiver(uint16_t adcValue){
     if ( (adcValue > MIN_DEADBAND_THRESHOLD && adcValue < MAX_DEADBAND_THRESHOLD) || !power){ // if adc in deadband
-        motorSpeedR = 0;
-        motorSpeedL = 0;
+        speed = 0;
     } else {
         if ( adcValue < MIN_DEADBAND_THRESHOLD ) {
-            motorSpeedL = map(adcValue, 0, MIN_DEADBAND_THRESHOLD, 100, 0);
-            motorSpeedR = 0;
+            speed = map(adcValue, MAX_LEFT, MIN_DEADBAND_THRESHOLD, 100, 0);
+            direction = 'L';
         }
         if ( adcValue > MAX_DEADBAND_THRESHOLD ) {
-            motorSpeedR = map(adcValue, 4096, MAX_DEADBAND_THRESHOLD, 100, 0);
-            motorSpeedL = 0;
+            speed = map(adcValue, MAX_RIGHT, MAX_DEADBAND_THRESHOLD, 100, 0);
+            direction = 'R';
         }
-    }
-    if ( !power || (motorSpeedL == 0 && motorSpeedR == 0)) {
-        speed = 0;
-        direction = 'N';
-    } else if ( motorSpeedL > 0) {
-        speed = motorSpeedL;
-        direction = 'L';
-    } else if ( motorSpeedR > 0) {
-        speed = motorSpeedR; 
-        direction = 'R';
     }
 }
 void handleLEDVisualizer(){
-    uint8_t LEDBarGraphL = map(motorSpeedL,0,100,1,4);
-    uint8_t LEDBarGraphR = map(motorSpeedR,0,100,1,4);
+    uint8_t LEDBarGraphL;
+    uint8_t LEDBarGraphR;
+
+    if (direction =='L')        {
+        LEDBarGraphL = map(speed,0,100,1,4); 
+        LEDBarGraphR = 0;
+    } else if (direction == 'R') {
+        LEDBarGraphR = map(speed,0,100,1,4); 
+        LEDBarGraphL = 0;
+    }
     
-    if ( motorSpeedL == 0 ) LEDBarGraphL = 0;
-    if ( motorSpeedR == 0 ) LEDBarGraphR = 0;
-    if (!power) GPIOC->ODR = 0x00;
+    if (!power || speed == 0) GPIOC->ODR = 0x00;
     else if ( power ) {
         if (LEDBarGraphR == 0) {
             switch (LEDBarGraphL) { // toggles left LED bar graph
@@ -144,7 +143,7 @@ void handleLEDVisualizer(){
 // CLI functions
 void monitorADC(uint8_t adcValue) {
     if ( speed != prevSpeed ) {
-        usart2Printf("\nADC Value: %d Speed: %d%%\r\n", adcValue, speed);
+        usart2Printf("ADC Value: %d Speed: %d%%\r\n", adcValue, speed);
         prevSpeed = speed;
     }
 }
@@ -166,7 +165,8 @@ void CLIcommandParser(uint16_t adcValue, char *input) {
     if (strcmp(cmd, "MANUAL") == 0 && arg1) {
         if (strcmp(arg1, "OFF") == 0) {
             manualMode = 0;
-            usart2Printf("\nSTM32 -> Manual control disabled. Motor now controlled via CLI.\r\n\n");
+            speed = 0;
+            usart2Printf("\nSTM32 -> Manual control disabled. Motor now controlled via CLI.\r\n");
         } else if ( strcmp(arg1, "ON") == 0) {
             manualMode = 1;
             usart2Printf("\nSTM32 -> Manual control enabled. Motor now controlled via potentiometer.\r\n\n");
@@ -185,13 +185,11 @@ void CLIcommandParser(uint16_t adcValue, char *input) {
             usart2Printf("\nSTM32 -> Speed set to %d, Direction set to ", speed);
             if (speed <= 255 && speed >= 0) {
                 if (strcmp(arg4, "L") == 0) {
-                    motorSpeedL = 0;
-                    motorSpeedR = speed;
+                    direction = 'L';
                     usart2Printf("Left\r\n\n");
 
                 } else if (strcmp(arg4, "R") == 0) {
-                    motorSpeedL = speed;
-                    motorSpeedR = 0;
+                    direction = 'R';
                     usart2Printf("Right\r\n\n");
 
                 } else {

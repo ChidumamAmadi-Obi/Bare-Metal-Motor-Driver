@@ -63,5 +63,4 @@ uint16_t ADCRead(uint8_t pin) {
     return getAvg(rawadc);
 }
 
-
 #endif

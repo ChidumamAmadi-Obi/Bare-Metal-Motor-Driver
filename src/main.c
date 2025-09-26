@@ -10,7 +10,7 @@ int main(void) {
             }
         if (manualMode) manualInputReceiver(adcVal);
         if (monitorMode) monitorADC(adcVal);
-        handleMotorConrtol(motorSpeedL, motorSpeedR); 
+        handleMotorConrtol(); 
         handleLEDVisualizer();
     }
     return 0;
