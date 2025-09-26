@@ -85,8 +85,8 @@ void manualInputReceiver(uint16_t adcValue){
     }
 }
 void handleLEDVisualizer(){
-    uint8_t LEDBarGraphL;
-    uint8_t LEDBarGraphR;
+    uint8_t LEDBarGraphL=0;
+    uint8_t LEDBarGraphR=0;
 
     if (direction =='L')        {
         LEDBarGraphL = map(speed,0,100,1,4); 
@@ -228,5 +228,6 @@ void CLIcommandParser(uint16_t adcValue, char *input) {
         usart2Printf("\nSTM32 -> ERROR: Invalid command. Type 'HELP' for more information.\r\n\n");
     }
 }
+
 
 #endif
