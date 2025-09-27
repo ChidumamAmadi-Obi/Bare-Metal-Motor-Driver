@@ -1,5 +1,11 @@
 # Bare-Metal STM32 Motor Driver, PWM + ADC Control without HAL
-A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, featuring **register-level** peripheral control, **analog sensor processing**, **hardware PWM generation**, and a **CLI interface** - all without HAL, CubeMX, or Arduino frameworks.
+A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, featuring **register-level** peripheral control, **analog sensor processing**, **hardware PWM generation**, and a **CLI interface**, all without HAL, CubeMX, or Arduino frameworks.
+
+The system provides two modes of operation:
+* Manual Mode: Motor speed and direction controlled via potentiometer
+* CLI Control Mode: Motor fully controlled through serial commands (e.g. SET SPEED 100 DIR R).
+
+A custom LED bar graph provides real-time visual feedback of motor speed and direction.
 
 ## Demos 
 ### Direction Control, PWM & LED Visualizer
@@ -10,19 +16,10 @@ A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, fe
 
 ## Features
 * **Bare-Metal Efficiency:** Direct register access for optimal preformance and control.
-* **Dual Control Modes:**
-   * **Manual Mode:** Motor speed/direction controlled by a potentiometer.
-   * **CLI Mode:** Full control via a serial terminal (e.g. 'SET SPEED 200 DIR L'). 
+* **Dual Control Modes:** Potentiometer (manual) or CLI (USART).
 * **Real-Time Visual Feedback:** 8-LED bar graph visually displays motor speed and direction.
 * **Robust CLI Parser:** Handles commands like 'STATUS', 'HELP', 'MANUAL ON/OFF', and custom speed/direction settings.
 * **Professional Software Design:** Modular drivers for USART, ADC, GPIO, and Timers.
-
-## Control Behaviour 
-* Turn the potentiometer **left** - motor spins left / left LED brightens.
-* Turn the potentiometer **right** - motor spins right / right LED brightens.
-* Center potentiometer - motor stops / LEDs off.
-* CLI commands - full control and monitoring via serial interface.
-* Visualize motor speed with LED bar graph.
 
 ## Getting Started
 #### Prerequisites
