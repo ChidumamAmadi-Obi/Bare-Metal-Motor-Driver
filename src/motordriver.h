@@ -25,20 +25,20 @@ bool monitorMode = 0;
 // Initlalize system
 void systemInit(){
     SysTickInit();
+    enableClocks(CLOCK_GPIOA | CLOCK_GPIOB | CLOCK_GPIOC ,CLOCK_TIM2 | CLOCK_TIM3, 0);
+    
     usart2Init(115200);
     usart2Printf("==================================================\r\n");
+    usart2Printf("  Clocks enabled\r\n");
     usart2Printf("  USART2 Initialized\r\n");
     usart2Printf("  System clock: %d Hz\r\n", SystemCoreClock);
 
     ADCInit(0);
     usart2Printf("  ADC Pin PA0 Initialized\r\n");
 
-    enableClocks();
-    usart2Printf("  Clocks TIM2 and TIM3 configured\r\n");
-    usart2Printf("  Clocks for GPIO ports A, B and C configured\r\n");
-
-    configGPIO();
-    usart2Printf("  GPIO Pins D5 and D6 configured\r\n");
+    configGPIO_PWM();
+    configGPIO_Port(GPIOC, 1, 0, 2); // configures PC0-PC7 as outputs, push-pull, high speed
+    usart2Printf("  GPIO Pins configured\r\n");
 
     configTimerPWM_D6(0); // D6 and D5 with TIM2 and TIM3 - 10Hz, 0% duty cycle
     configTimerPWM_D5(0);
@@ -85,8 +85,8 @@ void manualInputReceiver(uint16_t adcValue){
     }
 }
 void handleLEDVisualizer(){
-    uint8_t LEDBarGraphL=0;
-    uint8_t LEDBarGraphR=0;
+    static uint8_t LEDBarGraphL=0;
+    static uint8_t LEDBarGraphR=0;
 
     if (direction =='L')        {
         LEDBarGraphL = map(speed,0,100,1,4); 
@@ -96,44 +96,44 @@ void handleLEDVisualizer(){
         LEDBarGraphL = 0;
     }
     
-    if (!power || speed == 0) GPIOC->ODR = 0x00;
+    if (!power || speed == 0) writeToPort(GPIOC, 0x00);
     else if ( power ) {
         if (LEDBarGraphR == 0) {
             switch (LEDBarGraphL) { // toggles left LED bar graph
                 case 1:
-                    GPIOC->ODR = 0x01;
+                    writeToPort(GPIOC, 0x01);
                     break;
                 case 2:
-                    GPIOC->ODR = 0x03; 
+                    writeToPort(GPIOC, 0x03);
                     break;
                 case 3:
-                    GPIOC->ODR = 0x07; 
+                    writeToPort(GPIOC, 0x07);
                     break;
                 case 4:
-                    GPIOC->ODR = 0x0F; 
+                    writeToPort(GPIOC, 0x0F);
                     break;
 
                 default: 
-                    GPIOC->ODR = 0x00; // all LEDs off
+                    writeToPort(GPIOC, 0x00); // all LEDs off
                     break;
             }
         } else if (LEDBarGraphL == 0) {
             switch (LEDBarGraphR) { // toggles right LED bar graph
                 case 1:
-                    GPIOC->ODR = 0x10; 
+                    writeToPort(GPIOC, 0x10);
                     break;
                 case 2:
-                    GPIOC->ODR = 0x30; 
+                    writeToPort(GPIOC, 0x30);
                     break;
                 case 3:
-                    GPIOC->ODR = 0x70; 
+                    writeToPort(GPIOC, 0x70);
                     break;
                 case 4:
-                    GPIOC->ODR = 0xF0; 
+                    writeToPort(GPIOC, 0xF0);
                     break;
 
                 default:
-                    GPIOC->ODR = 0x00; // all LEDs off
+                    writeToPort(GPIOC, 0x00); // all LEDs off
                     break;
             }
         }
@@ -156,7 +156,7 @@ void printStatus(uint16_t adcValue){
 
 }
 void CLIcommandParser(uint16_t adcValue, char *input) {
-    char *cmd = strtok(input, " ");
+    char *cmd = strtok(input, " "); // strtok parses incoming data
     char *arg1 = strtok(NULL," ");
     char *arg2 = strtok(NULL," ");
     char *arg3 = strtok(NULL," ");
@@ -174,7 +174,7 @@ void CLIcommandParser(uint16_t adcValue, char *input) {
             usart2Printf("\nSTM32 -> ERROR: Invalid MANUAL argument. Use ON or OFF.\r\n\n");
         }
 
-    } else if (strcmp(cmd, "STATUS") == 0) {
+    } else if (strcmp(cmd, "STATUS") == 0) { // print current status of system variables
         usart2Printf("\nSTM32 -> ");
         printStatus(adcValue);
         usart2Printf("\r\n\n");
@@ -228,6 +228,5 @@ void CLIcommandParser(uint16_t adcValue, char *input) {
         usart2Printf("\nSTM32 -> ERROR: Invalid command. Type 'HELP' for more information.\r\n\n");
     }
 }
-
 
 #endif

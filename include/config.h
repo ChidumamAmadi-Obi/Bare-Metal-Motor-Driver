@@ -21,6 +21,20 @@
 #define MAX_LEFT 32 // top left spinning speed at adc value 35
 #define MAX_RIGHT 4096 // top right spinning speed at adc value 4096
 
+#define CLOCK_GPIOA RCC_AHB1ENR_GPIOAEN
+#define CLOCK_GPIOB RCC_AHB1ENR_GPIOBEN
+#define CLOCK_GPIOC RCC_AHB1ENR_GPIOCEN
+#define CLOCK_GPIOD RCC_AHB1ENR_GPIODEN
+#define CLOCK_GPIOE RCC_AHB1ENR_GPIOEEN
+
+#define CLOCK_TIM2 RCC_APB1ENR_TIM2EN
+#define CLOCK_TIM3 RCC_APB1ENR_TIM3EN
+#define CLOCK_TIM4 RCC_APB1ENR_TIM4EN
+#define CLOCK_TIM5 RCC_APB1ENR_TIM5EN
+
+
+
+
 // Timing functions
 void SysTickInit(void) { // for more accurate delay func
     SysTick->LOAD = SystemCoreClock/1000 - 1;  // 1 ms period

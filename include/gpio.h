@@ -3,17 +3,19 @@
 
 #include "stm32f4xx.h"
 
-void enableClocks(void){
-    // Clocks for PWM pins
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;       
-    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;        
-    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;       
-    
-    // Clock for GPIOC
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+void enableClocks(uint32_t ahb1Periphs, uint32_t apb1Periphs, uint32_t apb2Periphs) { // enables clocks needed
+    if (ahb1Periphs != 0) { // enables clocks from AHB1 peripherals
+        RCC->AHB1ENR |= ahb1Periphs;
+    }
+    if (apb1Periphs != 0) { // enables clocks from APB1 peripherals
+        RCC->APB1ENR |= apb1Periphs;
+    }
+    if (apb2Periphs != 0) { // enables clocks from APB2 peripherals
+        RCC->APB2ENR |= apb2Periphs;
+    }
 }
-void configGPIO(void){ // each PWM enabled GPIO pin is configured with a separate clock 
+
+void configGPIO_PWM(void){ // each PWM enabled GPIO pin is configured with a separate clock 
     // Configures D6 (PB10) with TIM2_CH3
     GPIOB->MODER &= ~GPIO_MODER_MODER10;       
     GPIOB->MODER |= GPIO_MODER_MODER10_1;      
@@ -27,14 +29,7 @@ void configGPIO(void){ // each PWM enabled GPIO pin is configured with a separat
     
     GPIOB->AFR[0] &= ~GPIO_AFRL_AFSEL4;        
     GPIOB->AFR[0] |= (2 << 16);        
-    
-    // Configures pins PC0-PC7 as outputs
-    for (uint8_t pin = 0; pin < 8; pin++) {
-        GPIOC->MODER = (GPIOC->MODER & ~(0x3 << (pin * 2))) | (0x1 << (pin * 2)); // clear and set mode to output
-        GPIOC->OSPEEDR &= ~(1 << pin); // Ser output type to push-pull
-    }
 }
-
 void configTimerPWM_D6(uint8_t dutyCycle) {
     TIM2->CR1 &= ~TIM_CR1_CEN;                
     TIM2->PSC = 16 - 1;                       // 16MHz/16 = 1MHz timer clock
@@ -64,6 +59,26 @@ void configTimerPWM_D5(uint8_t dutyCycle) {
     TIM3->CR1 |= TIM_CR1_CEN;                 
 }
 
+void configGPIO_Port(GPIO_TypeDef* port, uint8_t mode, uint8_t outputType, uint8_t speed) { // configures port a b or c at once
+    for (uint8_t pin = 0; pin < 8; pin++) {
+        port->MODER = (port->MODER & ~(0x3 << (pin * 2))) | ((mode & 0x3) << (pin * 2)); // Configure MODER (Mode Register)
+        
+        if (mode == 1) { // Configure OTYPER (Output Type Register) - only for output mode
+            if (outputType) {
+                port->OTYPER |= (1 << pin);  // Open-drain
+            } else {
+                port->OTYPER &= ~(1 << pin); // Push-pull
+            }
+        }
+        
+        if (mode == 1) { // Configure OSPEEDR (Output Speed Register) - only for output mode
+            port->OSPEEDR = (port->OSPEEDR & ~(0x3 << (pin * 2))) | ((speed & 0x3) << (pin * 2));
+        }
+    }
+}
+inline void writeToPort(GPIO_TypeDef* port, uint8_t output) { // writes to port a b or c at once
+    port->ODR = output;
+}
 void configureOnBoardLED(void){ 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       // enables GPIOA clocks
     GPIOA->MODER |= (1 << 10);                 // Set PA5 as output

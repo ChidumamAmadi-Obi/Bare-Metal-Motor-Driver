@@ -11,7 +11,7 @@ volatile uint8_t CMDIndex = 0;
 volatile uint8_t CMDReady = 0;
 
 void usart2Init(uint32_t baud_rate) { // Initialize USART2 with specified baud rate 
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
     
     // Configures PA2 (TX) and PA3 (RX) for alternate function
@@ -30,6 +30,7 @@ void usart2Init(uint32_t baud_rate) { // Initialize USART2 with specified baud r
     NVIC_SetPriority(USART2_IRQn, 0);
     NVIC_EnableIRQ(USART2_IRQn);  // enables interrupt    
 }
+
 void usart2SendChar(char c) {
     while (!(USART2->SR & USART_SR_TXE)); 
     USART2->DR = (c & 0xFF);
@@ -127,7 +128,7 @@ void USART2_IRQHandler() { // gets called automatically when character is receiv
     if (USART2 -> SR & USART_SR_RXNE) {
         char c = USART2->DR; // reads char
         usart2SendChar(c); // Echo the character back to terminal
-        if (c == ASCII_BACKSPACE) {
+        if (c == ASCII_BACKSPACE) { // Backspace handling
             if (CMDIndex > 0) {
                 CMDIndex--;
             }
@@ -137,7 +138,7 @@ void USART2_IRQHandler() { // gets called automatically when character is receiv
             CMDReady = 1; 
             usart2NewLine(); 
         } else if ( c == '\n') {
-            //ignore 
+            // ignore 
         } else {
             if (CMDIndex < CMD_BUFFER_SIZE - 1) {
                 CMDBuffer[CMDIndex++] = c;
