@@ -3,7 +3,7 @@
 
 #include "stm32f4xx.h"
 
-void enableClocks(uint32_t ahb1Periphs, uint32_t apb1Periphs, uint32_t apb2Periphs) { // enables clocks needed
+void enableClocks(AHB1_Periphs_t ahb1Periphs, APB1_Periphs_t apb1Periphs, APB2_Periphs_t apb2Periphs) { // enables clocks needed
     if (ahb1Periphs != 0) { // enables clocks from AHB1 peripherals
         RCC->AHB1ENR |= ahb1Periphs;
     }
@@ -59,11 +59,11 @@ void configTimerPWM_D5(uint8_t dutyCycle) {
     TIM3->CR1 |= TIM_CR1_CEN;                 
 }
 
-void configGPIO_Port(GPIO_TypeDef* port, uint8_t mode, uint8_t outputType, uint8_t speed) { // configures port a b or c at once
+void configGPIO_Port(GPIO_TypeDef* port, GPIOMode_t mode, GPIOOutputType_t outputType, GPIOSpeed_t speed) { // configures port a b or c at once
     for (uint8_t pin = 0; pin < 8; pin++) {
-        port->MODER = (port->MODER & ~(0x3 << (pin * 2))) | ((mode & 0x3) << (pin * 2)); // Configure MODER (Mode Register)
+        port->MODER = (port->MODER & ~(0x3 << (pin * 2))) | ((mode & 0x3) << (pin * 2)); // Sets port as input or output
         
-        if (mode == 1) { // Configure OTYPER (Output Type Register) - only for output mode
+        if (mode == 1) { // Configure Output Type Register - only for output mode
             if (outputType) {
                 port->OTYPER |= (1 << pin);  // Open-drain
             } else {
@@ -76,7 +76,7 @@ void configGPIO_Port(GPIO_TypeDef* port, uint8_t mode, uint8_t outputType, uint8
         }
     }
 }
-inline void writeToPort(GPIO_TypeDef* port, uint8_t output) { // writes to port a b or c at once
+void writeToPort(GPIO_TypeDef* port, uint8_t output) { // writes to port a b or c at once
     port->ODR = output;
 }
 void configureOnBoardLED(void){ 

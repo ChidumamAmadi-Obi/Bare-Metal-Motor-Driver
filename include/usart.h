@@ -11,7 +11,6 @@ volatile uint8_t CMDIndex = 0;
 volatile uint8_t CMDReady = 0;
 
 void usart2Init(uint32_t baud_rate) { // Initialize USART2 with specified baud rate 
-    
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
     
     // Configures PA2 (TX) and PA3 (RX) for alternate function

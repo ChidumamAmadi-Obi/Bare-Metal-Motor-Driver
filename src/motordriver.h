@@ -30,18 +30,18 @@ void systemInit(){
     usart2Init(115200);
     usart2Printf("==================================================\r\n");
     usart2Printf("  Clocks enabled\r\n");
-    usart2Printf("  USART2 Initialized\r\n");
+    usart2Printf("  USART2 Initialized, 115200 baud\r\n");
     usart2Printf("  System clock: %d Hz\r\n", SystemCoreClock);
 
-    ADCInit(0);
+    ADC1Init(PA0);
     usart2Printf("  ADC Pin PA0 Initialized\r\n");
 
     configGPIO_PWM();
-    configGPIO_Port(GPIOC, 1, 0, 2); // configures PC0-PC7 as outputs, push-pull, high speed
+    configGPIO_Port(GPIOC, GPIO_MODE_OUTPUT, GPIO_OUTPUT_PP, GPIO_SPEED_HIGH); // configures PC0-PC7 as outputs, push-pull, high speed
     usart2Printf("  GPIO Pins configured\r\n");
 
-    configTimerPWM_D6(0); // D6 and D5 with TIM2 and TIM3 - 10Hz, 0% duty cycle
-    configTimerPWM_D5(0);
+    configTimerPWM_D6(0); configTimerPWM_D5(0); // D6 and D5 with TIM2 and TIM3 - 10Hz, 0% duty cycle
+    
     usart2Printf("  Starting D6 and D5 on 0 percent duty cycle...\r");
     usart2Printf("--------------------------------------------------\r\n");
     usart2Printf("  Manual Mode enabled, control via potentiometer\r\n");
@@ -96,45 +96,23 @@ void handleLEDVisualizer(){
         LEDBarGraphL = 0;
     }
     
-    if (!power || speed == 0) writeToPort(GPIOC, 0x00);
+    if (!power || speed == 0) writeToPort(GPIOC, LEDS_OFF);
     else if ( power ) {
         if (LEDBarGraphR == 0) {
             switch (LEDBarGraphL) { // toggles left LED bar graph
-                case 1:
-                    writeToPort(GPIOC, 0x01);
-                    break;
-                case 2:
-                    writeToPort(GPIOC, 0x03);
-                    break;
-                case 3:
-                    writeToPort(GPIOC, 0x07);
-                    break;
-                case 4:
-                    writeToPort(GPIOC, 0x0F);
-                    break;
-
-                default: 
-                    writeToPort(GPIOC, 0x00); // all LEDs off
-                    break;
+                case 1:  writeToPort(GPIOC, LED_LEFT1); break;
+                case 2:  writeToPort(GPIOC, LED_LEFT2); break;
+                case 3:  writeToPort(GPIOC, LED_LEFT3); break;
+                case 4:  writeToPort(GPIOC, LED_LEFT4); break;
+                default: writeToPort(GPIOC, LEDS_OFF); break; 
             }
         } else if (LEDBarGraphL == 0) {
             switch (LEDBarGraphR) { // toggles right LED bar graph
-                case 1:
-                    writeToPort(GPIOC, 0x10);
-                    break;
-                case 2:
-                    writeToPort(GPIOC, 0x30);
-                    break;
-                case 3:
-                    writeToPort(GPIOC, 0x70);
-                    break;
-                case 4:
-                    writeToPort(GPIOC, 0xF0);
-                    break;
-
-                default:
-                    writeToPort(GPIOC, 0x00); // all LEDs off
-                    break;
+                case 1:   writeToPort(GPIOC, LED_RIGHT1); break;
+                case 2:   writeToPort(GPIOC, LED_RIGHT2); break;
+                case 3:   writeToPort(GPIOC, LED_RIGHT3); break;
+                case 4:   writeToPort(GPIOC, LED_RIGHT4); break;
+                default:  writeToPort(GPIOC, LEDS_OFF); break; 
             }
         }
     }
@@ -155,7 +133,7 @@ void printStatus(uint16_t adcValue){
     usart2Printf("            Direction   %c", direction);
 
 }
-void CLIcommandParser(uint16_t adcValue, char *input) {
+void CLIcommandParser(uint8_t adcValue, char *input) {
     char *cmd = strtok(input, " "); // strtok parses incoming data
     char *arg1 = strtok(NULL," ");
     char *arg2 = strtok(NULL," ");
