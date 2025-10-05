@@ -1,22 +1,14 @@
 # Bare-Metal STM32 Motor Driver, PWM + ADC Control without HAL
 A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, featuring **register-level** peripheral control, **analog sensor processing**, **hardware PWM generation**, and a **CLI interface**, all without HAL, CubeMX, or Arduino frameworks.
 
-The system provides two modes of operation:
-* Manual Mode: Motor speed and direction controlled via potentiometer
-* CLI Control Mode: Motor fully controlled through serial commands (e.g. SET SPEED 100 DIR R).
+## Demo
 
-A custom LED bar graph provides real-time visual feedback of motor speed and direction.
-
-## Demos 
-### Direction Control, PWM & LED Visualizer
-![IMG_2973-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/e9ab0777-c68f-48c7-974d-36f4139dba0c)
-
-### CLI Demonstration
-![2025-09-19-193643-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/b5bf2980-ab52-4334-b76e-ebab79aabcd2)
+https://github.com/user-attachments/assets/d7ecb600-70b1-4224-a463-c9ccc152d153
 
 ## Features
-* **Bare-Metal Efficiency:** Direct register access for optimal preformance and control.
-* **Dual Control Modes:** Potentiometer (manual) or CLI (USART).
+* **Bare-Metal Efficiency:** Direct register access CMSIS-compliant code for optimal performance and minimal footprint.
+* **Modular Peripheral Architecture:** Hardware-abstraction layer with separate drivers for USART, ADC (with software averaging), PWM timers, and GPIO
+* **Dual Control Modes:** Real-time potentiometer control with deadband filtering OR structured CLI commands via USART.
 * **Real-Time Visual Feedback:** 8-LED bar graph visually displays motor speed and direction.
 * **Robust CLI Parser:** Handles commands like 'STATUS', 'HELP', 'MANUAL ON/OFF', and custom speed/direction settings.
 * **Professional Software Design:** Modular drivers for USART, ADC, GPIO, and Timers.
@@ -76,8 +68,8 @@ pio device monitor # Monitor serial output
 * Set baud rate to **115200**
 * Type 'HELP to see all availible commands.
 
-<img width="1919" height="544" alt="image" src="https://github.com/user-attachments/assets/b99d3a66-4c1f-478a-8ddf-148e24acd968" />
- ^ example output of CLI
+<img width="1919" height="604" alt="Screenshot 2025-09-20 201327" src="https://github.com/user-attachments/assets/3dac693f-57d9-44b9-9bce-12d07e34c10a" />
+example with PuTTy^
 
 ### Roadmap
 **Phase 1: Basic**
@@ -93,7 +85,7 @@ pio device monitor # Monitor serial output
 **Phase 3: LED Visualizer, CLI & Motor Integration**
  - [x] Implement **LED bar graph visualizer** (8–10 LEDs, showing direction + speed)
  - [x] Impliment CLI control
- - [ ] Replace LEDs with DC motor via L9110H
+ - [x] Replace LEDs with DC motor via L9110H
 
 ### References
 * [STM32F401RE Reference Manual (RM0368)](https://www.st.com/resource/en/reference_manual/rm0368-stm32f401xbc-and-stm32f401xde-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
