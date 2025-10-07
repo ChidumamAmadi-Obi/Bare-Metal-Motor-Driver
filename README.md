@@ -3,7 +3,7 @@ A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, fe
 
 ## Demo
 
-![](https://github.com/user-attachments/assets/d7ecb600-70b1-4224-a463-c9ccc152d153)
+[](https://github.com/user-attachments/assets/d7ecb600-70b1-4224-a463-c9ccc152d153)
 
 ## Features
 * **Bare-Metal Efficiency:** Direct register access CMSIS-compliant code for optimal performance and minimal footprint.
