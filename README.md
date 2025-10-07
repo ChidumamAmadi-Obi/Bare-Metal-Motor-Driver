@@ -5,6 +5,8 @@ A **Bare-metal** motor control system implemented on **STM32 Nucleo-F401RE**, fe
 
 [](https://github.com/user-attachments/assets/d7ecb600-70b1-4224-a463-c9ccc152d153)
 
+![](https://github.com/user-attachments/assets/d7ecb600-70b1-4224-a463-c9ccc152d153)
+
 ## Features
 * **Bare-Metal Efficiency:** Direct register access CMSIS-compliant code for optimal performance and minimal footprint.
 * **Modular Peripheral Architecture:** Hardware-abstraction layer with separate drivers for USART, ADC (with software averaging), PWM timers, and GPIO
