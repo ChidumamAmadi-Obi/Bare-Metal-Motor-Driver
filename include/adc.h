@@ -23,7 +23,7 @@ void configureADC1GPIO(ADC1_PINS pin) {
 void ADC1Init(ADC1_PINS pin) {
     RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
     configureADC1GPIO(pin); // Configure GPIO for analog mode
-    ADC1->CR2 = 0;                         
+    ADC1->CR2 = 0;                          // Clear
     ADC1->CR1 &= ~ADC_CR1_RES;              // 12-bit resolution
     
     if (pin < 10) { // Configure sample time (480 cycles for all channels)
@@ -49,4 +49,5 @@ uint16_t ADC1Read(ADC1_PINS pin) {
     uint16_t rawadc = ADC1->DR; // reads ADC
     return getAvg(rawadc); // returns averaged value
 }
+
 #endif
