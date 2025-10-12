@@ -18,9 +18,9 @@ static uint8_t prevSpeed = 0;
 static uint8_t speed;
 static char direction;
 
-bool manualMode = 1;
-bool power = 1;
-bool monitorMode = 0;
+static bool manualMode = 1;
+static bool power = 1;
+static bool monitorMode = 0;
 
 // Initlalize system
 void systemInit(){
@@ -85,8 +85,8 @@ void manualInputReceiver(uint16_t adcValue){
     }
 }
 void handleLEDVisualizer(){
-    static uint8_t LEDBarGraphL=0;
-    static uint8_t LEDBarGraphR=0;
+    static uint8_t LEDBarGraphL;
+    static uint8_t LEDBarGraphR;
 
     if (direction =='L')        {
         LEDBarGraphL = map(speed,0,100,1,4); 

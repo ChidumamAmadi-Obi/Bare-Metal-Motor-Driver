@@ -2,8 +2,9 @@
 
 int main(void) {
     systemInit();
+    uint8_t adcVal;
     while(1) {
-        uint8_t adcVal = ADC1Read(PA0);
+        adcVal = ADC1Read(PA0);
         if (CMDReady) {
             CLIcommandParser(adcVal, (char*)CMDBuffer);
             CMDReady = 0;
