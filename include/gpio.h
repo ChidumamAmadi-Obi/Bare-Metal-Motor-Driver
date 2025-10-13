@@ -80,7 +80,6 @@ void writeToPort(GPIO_TypeDef* port, uint8_t output) { // writes to port a b or 
     port->ODR = output;
 }
 void configureOnBoardLED(void){ 
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;       // enables GPIOA clocks
     GPIOA->MODER |= (1 << 10);                 // Set PA5 as output
 }
 
