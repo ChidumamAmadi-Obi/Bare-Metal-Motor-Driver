@@ -34,11 +34,13 @@ void usart2SendChar(char c) { // sends character via tx
     while (!(USART2->SR & USART_SR_TXE)); 
     USART2->DR = (c & 0xFF);
 }
+
 void usart2SendString(const char *str) {
     while (*str) { // when not at the end of a string:   while (*str != '\0')
         usart2SendChar(*str++); // builds string until '\0'
     }
 }
+
 void usart2SendNumber(int32_t num) {
     char buffer[12]; // 12-bit, enough for -2,147,483,648
     char *ptr = buffer;
@@ -66,34 +68,42 @@ void usart2SendNumber(int32_t num) {
     //                move the pointer backward one position, happens before dereference    --ptr
     //                then send the character it's now pointing at.                         usart2SendChar(*--ptr);
 }
+
 void usart2NewLine(void) {
     usart2SendString("\r\n");
 }
+
 void simplePrintf(const char *format, va_list args) {
     while (*format) { // loop until you reach the end of the format string (null terminator)
         if (*format == '%') { // if char is '%'
             format++;
             switch (*format) {
-                case 'd': 
+                case 'd': {
                     int num = va_arg(args, int); // looks at data type that comes next (an int), reads the value of that data , moves pointer to the next arg, returns the int
                     usart2SendNumber(num);
                     break;
-                case 'c': 
+                }
+                case 'c': {
                     char c = (char)va_arg(args, int);
                     usart2SendChar(c);
-                    break;                
-                case 's': 
+                    break;
+                }
+                case 's': {
                     char *str = va_arg(args, char*); // looks for data type that comes next ( a pointer to the start of a string), reads the value, moves pointer to the next arg, returns the address to the start of the string
                     usart2SendString(str);
-                    break;                
+                    break;
+                }
                 default:
                     usart2SendChar(*format);
                     break;
             }
-        } else usart2SendChar(*format); // just send the character as is
+        } else {
+            usart2SendChar(*format); // just send the character as is
+        }
         format++;
     }
 }
+
 void usart2Printf(const char *format, ...) {// Format and send string
     va_list args; // create va_list object for simple print
     va_start(args, format); // start reading variable arguments that come AFTER the format parameter
@@ -124,4 +134,4 @@ void USART2_IRQHandler() { // gets called automatically when character is receiv
     }
 }
 
-#endif
+#endif // USART_H
