@@ -15,8 +15,8 @@
 #include "gpio.h"
 
 static uint8_t prevSpeed = 0;
-static uint8_t speed;
-static char direction;
+static uint8_t speed = 0;
+static char direction = 'N';
 
 static bool manualMode = 1;
 static bool power = 1;
@@ -206,5 +206,6 @@ void CLIcommandParser(uint8_t adcValue, char *input) {
         usart2Printf("\nSTM32 -> ERROR: Invalid command. Type 'HELP' for more information.\r\n\n");
     }
 }
+
 
 #endif
